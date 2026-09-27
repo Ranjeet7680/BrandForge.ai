@@ -12,7 +12,8 @@ import {
   PackageCheck,
   LayoutDashboard,
   Settings,
-  CheckCircle2
+  CheckCircle2,
+  BrainCircuit
 } from 'lucide-react';
 import { BrandProject } from '@/types/brand';
 
@@ -25,6 +26,7 @@ export type ActiveTab =
   | 'critic'
   | 'battle'
   | 'guardian'
+  | 'quality'
   | 'launch'
   | 'settings';
 
@@ -100,6 +102,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
       icon: Scale,
       badge: '5 Checks',
       badgeColor: 'bg-teal-500/10 text-teal-400 border border-teal-500/20'
+    },
+    {
+      id: 'quality' as ActiveTab,
+      label: '🌲 ML Report (RF + DL)',
+      icon: BrainCircuit,
+      badge: 'RF & DL',
+      badgeColor: 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20'
     },
     {
       id: 'launch' as ActiveTab,

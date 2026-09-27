@@ -13,6 +13,7 @@ import {
   Eye
 } from 'lucide-react';
 import { Stage4Visualize } from '@/types/brand';
+import { BrandCanvas3D } from '@/components/canvas/BrandCanvas3D';
 
 interface VisualIdentityStageProps {
   visualize: Stage4Visualize;
@@ -255,6 +256,23 @@ export const VisualIdentityStage: React.FC<VisualIdentityStageProps> = ({
               Generated in strict accordance with modern SVG standards. Safe for digital dark modes, vector billboards, favicon scaling, and high-DPI screens.
             </div>
           </div>
+        </div>
+
+        {/* 3D Brand Canvas Field */}
+        <div className="pt-4 border-t border-white/10 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-wider text-indigo-400">
+              Interactive 3D Geometric Brand Canvas
+            </span>
+            <span className="text-[11px] text-slate-400">
+              Procedural WebGL / Particle Constellation
+            </span>
+          </div>
+          <BrandCanvas3D
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
+            brandName={brandName}
+          />
         </div>
       </div>
 

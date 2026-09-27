@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
-import { Sparkles, Layers, Download, Settings, Plus, Flame } from 'lucide-react';
+import React, { useState } from 'react';
+import { Sparkles, Layers, Download, Settings, Plus, Flame, Volume2, VolumeX, BrainCircuit } from 'lucide-react';
 import { BrandProject } from '@/types/brand';
+import { soundEngine } from '@/lib/sound-engine';
 
 interface NavbarProps {
   currentProject: BrandProject;
@@ -25,6 +26,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   aiSource,
   onNavigateToStage,
 }) => {
+  const [isMuted, setIsMuted] = useState(!soundEngine.soundEnabled);
   return (
     <header className="sticky top-0 z-40 w-full border-b border-white/10 bg-[#090c15]/90 backdrop-blur-md">
       <div className="flex h-16 items-center justify-between px-4 sm:px-6">
@@ -96,9 +98,41 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="capitalize">{aiSource === 'local' ? 'Neural Engine' : `${aiSource} Live`}</span>
           </div>
 
+          {/* ML Quality Report Shortcut */}
+          <button
+            onClick={() => {
+              soundEngine.playClick();
+              onNavigateToStage('quality');
+            }}
+            className="hidden xl:flex h-9 items-center space-x-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 text-xs font-medium text-emerald-300 hover:bg-emerald-500/20 transition-colors"
+          >
+            <BrainCircuit className="h-3.5 w-3.5 text-emerald-400" />
+            <span>ML Quality Report</span>
+          </button>
+
+          {/* Sound Toggle Button */}
+          <button
+            onClick={() => {
+              const newState = soundEngine.toggleSound();
+              setIsMuted(!newState);
+              if (newState) soundEngine.playClick();
+            }}
+            className={`flex h-9 w-9 items-center justify-center rounded-lg border transition-colors ${
+              !isMuted
+                ? 'border-indigo-500/30 bg-indigo-500/10 text-indigo-300 hover:bg-indigo-500/20'
+                : 'border-white/10 bg-slate-800/80 text-slate-500 hover:text-slate-300'
+            }`}
+            title={!isMuted ? 'Mute Procedural Web Audio' : 'Unmute Procedural Web Audio'}
+          >
+            {!isMuted ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+          </button>
+
           {/* Export Button */}
           <button
-            onClick={onOpenExportModal}
+            onClick={() => {
+              soundEngine.playClick();
+              onOpenExportModal();
+            }}
             className="flex h-9 items-center space-x-1.5 rounded-lg border border-white/10 bg-slate-800/80 px-3 text-xs font-medium text-slate-200 hover:bg-slate-700 transition-colors"
           >
             <Download className="h-3.5 w-3.5 text-slate-300" />
@@ -107,7 +141,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Settings Button */}
           <button
-            onClick={onOpenSettingsModal}
+            onClick={() => {
+              soundEngine.playClick();
+              onOpenSettingsModal();
+            }}
             className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-slate-800/80 text-slate-300 hover:bg-slate-700 transition-colors"
             title="Configure AI & Settings"
           >

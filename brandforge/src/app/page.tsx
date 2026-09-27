@@ -17,6 +17,7 @@ import { VisualIdentityStage } from '@/components/stages/VisualIdentityStage';
 import { BrandCriticStage } from '@/components/stages/BrandCriticStage';
 import { BrandBattleStage } from '@/components/stages/BrandBattleStage';
 import { GuardianStage } from '@/components/stages/GuardianStage';
+import { QualityReportStage } from '@/components/stages/QualityReportStage';
 import { LaunchKitStage } from '@/components/stages/LaunchKitStage';
 
 import { NewProjectModal } from '@/components/modals/NewProjectModal';
@@ -307,6 +308,13 @@ export default function Home() {
 
                 {activeTab === 'guardian' && (
                   <GuardianStage
+                    project={currentProject}
+                    onProceedToDeliver={() => setActiveTab('quality')}
+                  />
+                )}
+
+                {activeTab === 'quality' && (
+                  <QualityReportStage
                     project={currentProject}
                     onProceedToDeliver={() => setActiveTab('launch')}
                   />
