@@ -31,8 +31,12 @@ export async function analyzeWithEmbeddings(
   visual_description: string
 ): Promise<DLEmbeddingsAnalysis> {
   // Attempt FastAPI backend
+  const apiBase = (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_API_URL)
+    ? process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, '')
+    : 'http://127.0.0.1:8000';
+
   try {
-    const res = await fetch('http://127.0.0.1:8000/api/embeddings/similarity', {
+    const res = await fetch(`${apiBase}/api/embeddings/similarity`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

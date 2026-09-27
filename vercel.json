@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "buildCommand": "cd brandforge && npm run build",
+  "outputDirectory": "brandforge/.next",
+  "installCommand": "cd brandforge && npm install"
+}

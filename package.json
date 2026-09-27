@@ -1,0 +1,11 @@
+{
+  "name": "brandforge-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix brandforge run dev",
+    "build": "npm --prefix brandforge run build",
+    "start": "npm --prefix brandforge run start",
+    "lint": "npm --prefix brandforge run lint"
+  }
+}
