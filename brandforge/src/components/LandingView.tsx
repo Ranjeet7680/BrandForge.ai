@@ -352,7 +352,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
       </header>
 
       {/* 2. HERO SECTION */}
-      <section className="relative pt-12 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <section id="hero" className="relative pt-12 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
         {/* Ambient Backdrops */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[550px] w-[550px] rounded-full bg-gradient-to-tr from-indigo-600/20 via-purple-600/20 to-cyan-400/20 blur-[140px] pointer-events-none" />
         <div className="absolute top-1/2 -left-20 h-72 w-72 rounded-full bg-blue-600/15 blur-[120px] pointer-events-none" />
@@ -471,8 +471,44 @@ export const LandingView: React.FC<LandingViewProps> = ({
         </div>
       </section>
 
+      {/* 5. LANDING PAGE SECTIONS (PREVIEW & DIRECTORY) - Matching panel 5 of screenshot */}
+      <section className="py-6 px-4 sm:px-6 lg:px-8 border-y border-white/10 bg-[#080b18]/80 backdrop-blur-md">
+        <div className="mx-auto max-w-7xl space-y-3">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
+              Landing Page Sections (Interactive Directory)
+            </span>
+            <span className="text-[11px] text-slate-400 hidden sm:inline">
+              Click any section to navigate instantly
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+            {[
+              { label: 'Hero Section', href: '#hero', tag: 'Visual Flow', color: 'border-cyan-500/30 bg-cyan-950/20' },
+              { label: 'Features Section', href: '#features', tag: '12 Systems', color: 'border-indigo-500/30 bg-indigo-950/20' },
+              { label: 'How It Works', href: '#how-it-works', tag: '6 AI Stages', color: 'border-purple-500/30 bg-purple-950/20' },
+              { label: 'Brand Battle', href: '#brand-battle', tag: '5 Directions', color: 'border-rose-500/30 bg-rose-950/20' },
+              { label: 'Brand Guardian', href: '#guardian', tag: 'Live Audit', color: 'border-teal-500/30 bg-teal-950/20' },
+              { label: 'Pricing Section', href: '#pricing', tag: 'Free & Pro', color: 'border-emerald-500/30 bg-emerald-950/20' },
+            ].map((sec) => (
+              <a
+                key={sec.label}
+                href={sec.href}
+                onClick={() => soundEngine.playClick()}
+                className={`rounded-xl border ${sec.color} p-3 text-left hover:scale-[1.02] hover:border-white/40 transition-all`}
+              >
+                <span className="text-[10px] font-bold text-cyan-300 block">{sec.tag}</span>
+                <span className="text-xs font-bold text-white block mt-0.5">{sec.label}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* 3. TRUST & STATS SECTION */}
-      <section className="py-12 border-y border-white/5 bg-slate-950/40">
+      <section className="py-12 border-b border-white/5 bg-slate-950/40">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
           <div className="text-center">
             <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">

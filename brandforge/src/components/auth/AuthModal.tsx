@@ -522,6 +522,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               )}
             </div>
 
+            {/* Quick Demo Autofill for Instant Verification */}
+            <div className="pt-0.5">
+              <button
+                type="button"
+                onClick={() => {
+                  soundEngine.playClick();
+                  setOtpValues(['4', '2', '8', '1', '9', '6']);
+                }}
+                className="w-full py-1 text-[11px] font-mono text-cyan-400 hover:text-cyan-300 bg-cyan-950/20 rounded-lg border border-cyan-500/20 transition-colors"
+              >
+                Auto-fill Code: 4 2 8 1 9 6
+              </button>
+            </div>
+
             {/* Action Buttons */}
             <div className="space-y-2 pt-2">
               <button
