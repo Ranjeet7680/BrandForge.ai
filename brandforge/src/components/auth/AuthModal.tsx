@@ -121,17 +121,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       setOtpSuccess(true);
       soundEngine.playSuccessChord();
       confetti({
-        particleCount: 50,
-        spread: 60,
+        particleCount: 65,
+        spread: 70,
         origin: { y: 0.6 },
         colors: ['#6366f1', '#a855f7', '#06b6d4', '#10b981'],
       });
 
       setTimeout(() => {
         setOtpSuccess(false);
-        setMode('onboarding');
-      }, 900);
-    }, 800);
+        onLoginSuccess({
+          name: name || 'Ranjeet Kumar',
+          email: email || 'rajranjeet7680@gmail.com',
+          role: role || 'Student Builder',
+        });
+        onClose();
+      }, 700);
+    }, 700);
   };
 
   const handleFinishOnboarding = () => {
@@ -190,8 +195,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 type="button"
                 onClick={() => {
                   soundEngine.playClick();
-                  onLoginSuccess({ name: 'Ranjeet Kumar', email: 'rajranjeet7680@gmail.com', role: 'Student Builder' });
-                  onClose();
+                  setEmail('rajranjeet7680@gmail.com');
+                  setName('Ranjeet Kumar');
+                  setMode('otp');
                 }}
                 className="w-full flex items-center justify-center space-x-2 rounded-xl border border-white/10 bg-slate-900/80 py-2.5 text-xs font-semibold text-slate-200 hover:bg-slate-800 hover:border-white/20 transition-all"
               >
@@ -220,8 +226,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 type="button"
                 onClick={() => {
                   soundEngine.playClick();
-                  onLoginSuccess({ name: 'Ranjeet Kumar', email: 'rajranjeet7680@gmail.com', role: 'Student Builder' });
-                  onClose();
+                  setEmail('rajranjeet7680@gmail.com');
+                  setName('Ranjeet Kumar');
+                  setMode('otp');
                 }}
                 className="w-full flex items-center justify-center space-x-2 rounded-xl border border-white/10 bg-slate-900/80 py-2.5 text-xs font-semibold text-slate-200 hover:bg-slate-800 hover:border-white/20 transition-all"
               >
@@ -232,9 +239,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               </button>
             </div>
 
+            {/* Quick Demo 1-Click Button */}
+            <button
+              type="button"
+              onClick={() => {
+                soundEngine.playClick();
+                setEmail('rajranjeet7680@gmail.com');
+                setName('Ranjeet Kumar');
+                setMode('otp');
+              }}
+              className="w-full flex items-center justify-center space-x-2 rounded-xl border border-cyan-500/40 bg-cyan-950/25 py-2.5 text-xs font-bold text-cyan-300 hover:bg-cyan-900/30 hover:border-cyan-400 transition-all shadow-sm shadow-cyan-950/40"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
+              <span>⚡ 1-Click Demo Login → Verify via OTP</span>
+            </button>
+
             <div className="flex items-center space-x-3">
               <div className="h-px flex-1 bg-white/10" />
-              <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">or</span>
+              <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">or email</span>
               <div className="h-px flex-1 bg-white/10" />
             </div>
 
@@ -243,8 +265,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               onSubmit={(e) => {
                 e.preventDefault();
                 soundEngine.playClick();
-                onLoginSuccess({ name, email, role });
-                onClose();
+                setMode('otp');
               }}
               className="space-y-3.5"
             >
@@ -301,7 +322,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 type="submit"
                 className="w-full flex items-center justify-center space-x-2 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 py-3 text-xs font-bold text-white shadow-lg shadow-indigo-600/30 hover:from-indigo-500 hover:to-purple-500 transition-all"
               >
-                <span>Sign In</span>
+                <span>Continue to OTP Verification</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
             </form>
@@ -530,9 +551,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   soundEngine.playClick();
                   setOtpValues(['4', '2', '8', '1', '9', '6']);
                 }}
-                className="w-full py-1 text-[11px] font-mono text-cyan-400 hover:text-cyan-300 bg-cyan-950/20 rounded-lg border border-cyan-500/20 transition-colors"
+                className="w-full py-1.5 text-xs font-mono font-bold text-cyan-300 hover:text-white bg-cyan-950/40 rounded-xl border border-cyan-500/30 transition-all hover:border-cyan-400 shadow-sm"
               >
-                Auto-fill Code: 4 2 8 1 9 6
+                ⚡ 1-Click Autofill Code: 4 2 8 1 9 6
               </button>
             </div>
 
@@ -541,13 +562,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <button
                 onClick={handleVerifyOtp}
                 disabled={isVerifyingOtp}
-                className="w-full flex items-center justify-center space-x-2 rounded-xl bg-gradient-to-r from-cyan-500 via-indigo-600 to-purple-600 py-3 text-xs font-bold text-white shadow-lg shadow-cyan-500/30 hover:from-cyan-400 hover:to-purple-500 transition-all disabled:opacity-50"
+                className="w-full flex items-center justify-center space-x-2 rounded-xl bg-gradient-to-r from-cyan-500 via-indigo-600 to-purple-600 py-3.5 text-xs font-extrabold text-white shadow-xl shadow-cyan-500/30 hover:from-cyan-400 hover:to-purple-500 transition-all disabled:opacity-50 hover:scale-[1.02]"
               >
                 {isVerifyingOtp ? (
-                  <span>Verifying Code...</span>
+                  <span>Verifying Code & Loading Workspace...</span>
                 ) : (
                   <>
-                    <span>Verify &amp; Continue</span>
+                    <span>Verify OTP &amp; Open Dashboard</span>
                     <ArrowRight className="h-4 w-4" />
                   </>
                 )}

@@ -10,6 +10,7 @@ interface UserProfileMenuProps {
   onLogout: () => void;
   onReplayLoading: () => void;
   onOpenAuth: () => void;
+  onOpenLanding?: () => void;
 }
 
 export const UserProfileMenu: React.FC<UserProfileMenuProps> = ({
@@ -18,6 +19,7 @@ export const UserProfileMenu: React.FC<UserProfileMenuProps> = ({
   onLogout,
   onReplayLoading,
   onOpenAuth,
+  onOpenLanding,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -81,6 +83,20 @@ export const UserProfileMenu: React.FC<UserProfileMenuProps> = ({
               <CreditCard className="h-3.5 w-3.5 text-slate-400" />
               <span>Billing &amp; License</span>
             </button>
+
+            {onOpenLanding && (
+              <button
+                onClick={() => {
+                  soundEngine.playClick();
+                  setIsOpen(false);
+                  onOpenLanding();
+                }}
+                className="w-full flex items-center space-x-2.5 rounded-lg px-3 py-2 text-cyan-300 hover:bg-cyan-950/30 hover:text-white transition-colors"
+              >
+                <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
+                <span>View Landing Page</span>
+              </button>
+            )}
 
             <button
               onClick={() => {

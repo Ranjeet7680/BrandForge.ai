@@ -18,6 +18,11 @@ import {
   Check,
   AlertTriangle,
   Play,
+  LayoutDashboard,
+  Search,
+  Cpu,
+  Layers,
+  Users,
 } from 'lucide-react';
 import { soundEngine } from '@/lib/sound-engine';
 
@@ -25,13 +30,19 @@ interface LandingViewProps {
   onStartBuilding: () => void;
   onViewExample: () => void;
   onOpenAuth: () => void;
+  onNavigateToDashboard?: (tab?: string) => void;
 }
 
 export const LandingView: React.FC<LandingViewProps> = ({
   onStartBuilding,
   onViewExample,
   onOpenAuth,
+  onNavigateToDashboard,
 }) => {
+  // Features section category filter and search state
+  const [featureCategory, setFeatureCategory] = useState<'all' | 'strategy' | 'identity' | 'protection' | 'ml'>('all');
+  const [featureSearch, setFeatureSearch] = useState<string>('');
+
   // Brand Battle Interactive Direction Selector
   const [selectedDirection, setSelectedDirection] = useState<'A' | 'B' | 'C' | 'D' | 'E'>('A');
 
@@ -138,76 +149,172 @@ export const LandingView: React.FC<LandingViewProps> = ({
 
   const features = [
     {
-      title: '1. Multi-Agent Brand Strategy',
-      desc: 'Autonomous AI council explores market positioning, moats, and ICP personas.',
+      id: 'f1',
+      title: 'Multi-Agent Brand Strategy',
+      category: 'strategy' as const,
+      categoryLabel: 'Strategy & Market',
+      stageNum: 'Stage 01',
+      stageTab: 'discover',
+      metric: '3 Micro-Segments',
+      desc: 'Autonomous AI council explores market positioning, defensible moats, and ICP personas.',
       details:
         'Employs multi-agent consensus to stress-test your core premise, eliminating blind spots before market commitment.',
+      icon: Compass,
+      color: 'text-blue-400 border-blue-500/30 bg-blue-500/10',
     },
     {
-      title: '2. Intelligent Positioning',
+      id: 'f2',
+      title: 'Intelligent Positioning',
+      category: 'strategy' as const,
+      categoryLabel: 'Strategy & Market',
+      stageNum: 'Stage 02',
+      stageTab: 'position',
+      metric: '2D Moat Quadrant',
       desc: 'Automatic category creation, value proposition, and 2D competitive quadrants.',
       details:
         'Plots your brand dynamically against existing market incumbents, identifying the exact whitespace opportunity.',
+      icon: Crosshair,
+      color: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10',
     },
     {
-      title: '3. Brand Personality Engine',
-      desc: 'Formulates 3–5 distinctive core traits, tone sliders, and explicit anti-traits.',
-      details:
-        'Establishes strictly defined boundaries for what your brand is and what it refuses to be (e.g. No corporate HR fluff).',
-    },
-    {
-      title: '4. AI Naming Studio',
-      desc: 'Explores 4 naming territories: Descriptive, Metaphorical, Invented, Evocative.',
-      details:
-        'Generates names with phoneme cadence analysis, linguistic defensibility, and matched taglines.',
-    },
-    {
-      title: '5. Visual Identity System',
-      desc: 'Dynamic SVG vector marks, WCAG AA color palettes, and typography tokens.',
-      details:
-        'Produces downloadable SVG marks, accessible hex tokens, and an interactive 3D particle constellation canvas.',
-    },
-    {
-      title: '6. Brand Battle Arena',
-      desc: '5 autonomous AI agents engage in an adversarial debate over strategic directions.',
-      details:
-        'The Strategist, Creative Director, Customer Persona, Critic, and Guardian clash across 3 rounds to crown the optimal brand.',
-    },
-    {
-      title: '7. Adversarial Brand Critic',
-      desc: 'Diagnoses clichés, generic promises, and jargon with side-by-side comparative diffs.',
-      details:
-        'Replaces empty tech buzzwords with punchy, concrete claims through Original → Critique → Alternative → Revised loops.',
-    },
-    {
-      title: '8. Brand Guardian',
-      desc: 'Live consistency engine auditing draft marketing copy against your Brand DNA.',
-      details:
-        'Audits landing pages, ads, and social copy for personality match, tone guardrails, and compliance scoring.',
-    },
-    {
-      title: '9. Launch Kit Generator',
-      desc: '1-click generation of social copy, 5-part X thread, LinkedIn posts, and PR announcements.',
-      details:
-        'Synthesizes launch-ready copy with downloadable Markdown, JSON, and PDF brand book exports.',
-    },
-    {
-      title: '10. Brand Consistency Engine',
-      desc: 'Cross-stage state persistence ensuring all downstream assets share unified DNA.',
-      details:
-        'Every change approved in Discover or Shape cascades automatically into Visuals, Critic audits, and Launch kits.',
-    },
-    {
-      title: '11. Audience Intelligence',
+      id: 'f3',
+      title: 'Audience Intelligence',
+      category: 'strategy' as const,
+      categoryLabel: 'Strategy & Market',
+      stageNum: 'Stage 01',
+      stageTab: 'discover',
+      metric: 'Psychological Profiles',
       desc: '3 micro-segments, pain levels, JTBD matrix, and risky assumption mapping.',
       details:
         'Deconstructs target builders into actionable psychological profiles with quantified willingness-to-adopt metrics.',
+      icon: Users,
+      color: 'text-cyan-400 border-cyan-500/30 bg-cyan-500/10',
     },
     {
-      title: '12. Machine Learning Quality Report',
+      id: 'f4',
+      title: 'Brand Personality Engine',
+      category: 'identity' as const,
+      categoryLabel: 'Identity & Visuals',
+      stageNum: 'Stage 03',
+      stageTab: 'shape',
+      metric: '4-Axis Tone Sliders',
+      desc: 'Formulates 3–5 distinctive core traits, tone sliders, and explicit anti-traits.',
+      details:
+        'Establishes strictly defined boundaries for what your brand is and what it refuses to be (e.g. No corporate HR fluff).',
+      icon: Sparkles,
+      color: 'text-purple-400 border-purple-500/30 bg-purple-500/10',
+    },
+    {
+      id: 'f5',
+      title: 'AI Naming Studio',
+      category: 'identity' as const,
+      categoryLabel: 'Identity & Visuals',
+      stageNum: 'Stage 03',
+      stageTab: 'shape',
+      metric: '4 Naming Territories',
+      desc: 'Explores 4 naming territories: Descriptive, Metaphorical, Invented, Evocative.',
+      details:
+        'Generates names with phoneme cadence analysis, linguistic defensibility, and matched taglines.',
+      icon: Zap,
+      color: 'text-amber-400 border-amber-500/30 bg-amber-500/10',
+    },
+    {
+      id: 'f6',
+      title: 'Visual Identity System',
+      category: 'identity' as const,
+      categoryLabel: 'Identity & Visuals',
+      stageNum: 'Stage 04',
+      stageTab: 'visualize',
+      metric: 'WCAG AA Validated',
+      desc: 'Dynamic SVG vector marks, WCAG AA color palettes, and typography tokens.',
+      details:
+        'Produces downloadable SVG marks, accessible hex tokens, and an interactive 3D particle constellation canvas.',
+      icon: Palette,
+      color: 'text-pink-400 border-pink-500/30 bg-pink-500/10',
+    },
+    {
+      id: 'f7',
+      title: 'Brand Battle Arena',
+      category: 'protection' as const,
+      categoryLabel: 'Debate & Protection',
+      stageNum: 'Stage 05',
+      stageTab: 'battle',
+      metric: '5 Debating Agents',
+      desc: '5 autonomous AI agents engage in an adversarial debate over strategic directions.',
+      details:
+        'The Strategist, Creative Director, Customer Persona, Critic, and Guardian clash across 3 rounds to crown the optimal brand.',
+      icon: Flame,
+      color: 'text-rose-400 border-rose-500/30 bg-rose-500/10',
+    },
+    {
+      id: 'f8',
+      title: 'Adversarial Brand Critic',
+      category: 'protection' as const,
+      categoryLabel: 'Debate & Protection',
+      stageNum: 'Stage 05',
+      stageTab: 'critic',
+      metric: 'Side-by-Side Diffs',
+      desc: 'Diagnoses clichés, generic promises, and jargon with side-by-side comparative diffs.',
+      details:
+        'Replaces empty tech buzzwords with punchy, concrete claims through Original → Critique → Alternative → Revised loops.',
+      icon: ShieldAlert,
+      color: 'text-amber-400 border-amber-500/30 bg-amber-500/10',
+    },
+    {
+      id: 'f9',
+      title: 'Brand Guardian',
+      category: 'protection' as const,
+      categoryLabel: 'Debate & Protection',
+      stageNum: 'Stage 06',
+      stageTab: 'guardian',
+      metric: 'Real-Time Guardrails',
+      desc: 'Live consistency engine auditing draft marketing copy against your Brand DNA.',
+      details:
+        'Audits landing pages, ads, and social copy for personality match, tone guardrails, and compliance scoring.',
+      icon: Scale,
+      color: 'text-teal-400 border-teal-500/30 bg-teal-500/10',
+    },
+    {
+      id: 'f10',
+      title: 'Brand Consistency Engine',
+      category: 'ml' as const,
+      categoryLabel: 'ML & Deliverables',
+      stageNum: 'Engine',
+      stageTab: 'overview',
+      metric: '100% Cascade Sync',
+      desc: 'Cross-stage state persistence ensuring all downstream assets share unified DNA.',
+      details:
+        'Every change approved in Discover or Shape cascades automatically into Visuals, Critic audits, and Launch kits.',
+      icon: Layers,
+      color: 'text-indigo-400 border-indigo-500/30 bg-indigo-500/10',
+    },
+    {
+      id: 'f11',
+      title: 'Machine Learning Quality Report',
+      category: 'ml' as const,
+      categoryLabel: 'ML & Deliverables',
+      stageNum: 'ML Engine',
+      stageTab: 'quality',
+      metric: 'Random Forest (100 Trees)',
       desc: 'Scikit-Learn Random Forest Regressor & Deep Learning vector embeddings evaluation.',
       details:
         'Quantifies brand strength across 8 feature vectors with Gini feature importances and archetype cosine similarities.',
+      icon: Cpu,
+      color: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10',
+    },
+    {
+      id: 'f12',
+      title: 'Launch Kit Generator',
+      category: 'ml' as const,
+      categoryLabel: 'ML & Deliverables',
+      stageNum: 'Stage 06',
+      stageTab: 'launch',
+      metric: 'Turnkey Multi-Channel',
+      desc: '1-click generation of social copy, 5-part X thread, LinkedIn posts, and PR announcements.',
+      details:
+        'Synthesizes launch-ready copy with downloadable Markdown, JSON, and PDF brand book exports.',
+      icon: PackageCheck,
+      color: 'text-purple-400 border-purple-500/30 bg-purple-500/10',
     },
   ];
 
@@ -327,24 +434,34 @@ export const LandingView: React.FC<LandingViewProps> = ({
           </nav>
 
           {/* CTA & Sign In */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2.5">
+            <button
+              onClick={() => {
+                soundEngine.playClick();
+                onViewExample();
+              }}
+              className="hidden sm:flex items-center space-x-1.5 rounded-xl border border-white/10 bg-slate-900/80 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white hover:border-white/20 transition-all"
+            >
+              <LayoutDashboard className="h-3.5 w-3.5 text-cyan-400" />
+              <span>Workspace</span>
+            </button>
             <button
               onClick={() => {
                 soundEngine.playClick();
                 onOpenAuth();
               }}
-              className="text-xs font-semibold text-slate-300 hover:text-white transition-colors"
+              className="text-xs font-semibold text-slate-300 hover:text-white transition-colors px-2 py-1.5"
             >
               Sign In
             </button>
             <button
               onClick={() => {
                 soundEngine.playClick();
-                onStartBuilding();
+                onOpenAuth();
               }}
               className="flex items-center space-x-1.5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-indigo-600/30 hover:from-indigo-500 hover:to-cyan-400 transition-all hover:scale-105"
             >
-              <span>Forge New Idea</span>
+              <span>Launch App</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
@@ -651,47 +768,267 @@ export const LandingView: React.FC<LandingViewProps> = ({
         </div>
       </section>
 
-      {/* 5. FEATURES SECTION (12 Cards) */}
+      {/* 5. FEATURES SECTION (12 Cards with Filter Tabs, Search & Capability Matrix) */}
       <section id="features" className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-950/40 border-y border-white/5">
         <div className="mx-auto max-w-7xl space-y-12">
+          {/* Header */}
           <div className="text-center space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-indigo-400">
-              Capabilities
+              Complete Brand Architecture
             </span>
             <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-              Everything you need to build a brand.
+              12 Intelligent Systems in One Unified Platform
             </h2>
             <p className="text-sm text-slate-400 max-w-xl mx-auto">
-              From market discovery to real-time marketing consistency, BrandForge delivers a complete system.
+              From market discovery to real-time marketing consistency, BrandForge delivers a complete, validated brand system.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {features.map((feat, idx) => (
-              <div
-                key={idx}
-                className="rounded-2xl border border-white/10 bg-slate-900/60 p-5 space-y-2.5 hover:border-indigo-500/40 hover:bg-slate-800/60 transition-all flex flex-col justify-between"
-              >
-                <div className="space-y-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                    <Zap className="h-4 w-4" />
-                  </div>
-                  <h3 className="text-sm font-bold text-white">{feat.title}</h3>
-                  <p className="text-xs text-slate-400 leading-relaxed">{feat.desc}</p>
-                </div>
+          {/* Category Filter Tabs & Search Bar */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-white/10 pb-6">
+            {/* Filter Tabs */}
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              {[
+                { id: 'all', label: 'All Systems', count: 12 },
+                { id: 'strategy', label: 'Strategy & Market', count: 3 },
+                { id: 'identity', label: 'Identity & Visuals', count: 3 },
+                { id: 'protection', label: 'Debate & Protection', count: 3 },
+                { id: 'ml', label: 'ML & Deliverables', count: 3 },
+              ].map((tab) => {
+                const isActive = featureCategory === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      soundEngine.playClick();
+                      setFeatureCategory(tab.id as typeof featureCategory);
+                    }}
+                    className={`flex items-center space-x-2 rounded-xl px-3.5 py-2 text-xs font-bold transition-all ${
+                      isActive
+                        ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 text-white shadow-lg shadow-indigo-600/30'
+                        : 'bg-slate-900/80 border border-white/10 text-slate-400 hover:text-white hover:border-white/20'
+                    }`}
+                  >
+                    <span>{tab.label}</span>
+                    <span
+                      className={`rounded-full px-1.5 py-0.2 text-[10px] font-mono ${
+                        isActive ? 'bg-black/30 text-white' : 'bg-slate-800 text-slate-400'
+                      }`}
+                    >
+                      {tab.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
 
+            {/* Search Input */}
+            <div className="relative w-full md:w-64">
+              <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-slate-500" />
+              <input
+                type="text"
+                value={featureSearch}
+                onChange={(e) => setFeatureSearch(e.target.value)}
+                placeholder="Search features..."
+                className="w-full rounded-xl border border-white/10 bg-slate-900/90 pl-9 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              />
+              {featureSearch && (
                 <button
-                  onClick={() => {
-                    soundEngine.playClick();
-                    setSelectedFeature(feat);
-                  }}
-                  className="pt-2 text-[11px] font-semibold text-indigo-400 hover:text-indigo-300 flex items-center"
+                  onClick={() => setFeatureSearch('')}
+                  className="absolute right-2.5 top-2 text-[10px] text-slate-400 hover:text-white"
                 >
-                  <span>Learn More</span>
-                  <ArrowRight className="ml-1 h-3 w-3" />
+                  Clear
                 </button>
+              )}
+            </div>
+          </div>
+
+          {/* Filtered Features Grid */}
+          {(() => {
+            const filtered = features.filter((feat) => {
+              const matchesCategory =
+                featureCategory === 'all' || feat.category === featureCategory;
+              const matchesSearch =
+                !featureSearch ||
+                feat.title.toLowerCase().includes(featureSearch.toLowerCase()) ||
+                feat.desc.toLowerCase().includes(featureSearch.toLowerCase()) ||
+                feat.metric.toLowerCase().includes(featureSearch.toLowerCase());
+              return matchesCategory && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+              return (
+                <div className="rounded-2xl border border-white/10 bg-slate-900/40 p-12 text-center space-y-3">
+                  <Search className="h-8 w-8 text-slate-500 mx-auto" />
+                  <p className="text-sm text-slate-300">No features matched &quot;{featureSearch}&quot;.</p>
+                  <button
+                    onClick={() => {
+                      setFeatureCategory('all');
+                      setFeatureSearch('');
+                    }}
+                    className="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-500"
+                  >
+                    Reset Filters
+                  </button>
+                </div>
+              );
+            }
+
+            return (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {filtered.map((feat) => {
+                  const Icon = feat.icon;
+                  return (
+                    <div
+                      key={feat.id}
+                      className="group rounded-2xl border border-white/10 bg-slate-900/60 p-5 space-y-3 hover:border-indigo-500/40 hover:bg-slate-800/70 transition-all flex flex-col justify-between"
+                    >
+                      <div className="space-y-3">
+                        {/* Top: Stage Tag + Metric Chip */}
+                        <div className="flex items-center justify-between text-[11px]">
+                          <span className="font-mono font-bold text-cyan-400 text-[10px] uppercase tracking-wider">
+                            {feat.stageNum}
+                          </span>
+                          <span className="rounded-full bg-white/5 border border-white/10 px-2 py-0.5 text-[10px] font-mono text-slate-300">
+                            {feat.metric}
+                          </span>
+                        </div>
+
+                        {/* Icon & Title */}
+                        <div className="flex items-start space-x-3">
+                          <div
+                            className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border ${feat.color}`}
+                          >
+                            <Icon className="h-5 w-5" />
+                          </div>
+                          <div>
+                            <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
+                              {feat.categoryLabel}
+                            </span>
+                            <h3 className="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors">
+                              {feat.title}
+                            </h3>
+                          </div>
+                        </div>
+
+                        {/* Description */}
+                        <p className="text-xs text-slate-400 leading-relaxed">{feat.desc}</p>
+                      </div>
+
+                      {/* Action Row */}
+                      <div className="pt-3 border-t border-white/5 flex items-center justify-between">
+                        <button
+                          onClick={() => {
+                            soundEngine.playClick();
+                            if (onNavigateToDashboard) {
+                              onNavigateToDashboard(feat.stageTab);
+                            } else {
+                              onViewExample();
+                            }
+                          }}
+                          className="text-[11px] font-bold text-cyan-400 hover:text-cyan-300 flex items-center group-hover:translate-x-0.5 transition-transform"
+                        >
+                          <span>Try in Workspace</span>
+                          <ArrowRight className="ml-1 h-3 w-3" />
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            soundEngine.playClick();
+                            setSelectedFeature(feat);
+                          }}
+                          className="text-[11px] font-medium text-slate-400 hover:text-white transition-colors"
+                        >
+                          Deep Dive
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
+            );
+          })()}
+
+          {/* CAPABILITY COMPARISON MATRIX: BrandForge AI vs Agency vs Generic Prompt */}
+          <div className="pt-10 space-y-6">
+            <div className="text-center space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-400">
+                Architectural Advantage
+              </span>
+              <h3 className="text-xl sm:text-2xl font-black text-white">
+                Why Multi-Agent Intelligence Outperforms Generic AI
+              </h3>
+              <p className="text-xs text-slate-400 max-w-lg mx-auto">
+                Single LLM prompts produce forgettable text. BrandForge builds defensible, battle-tested brand systems.
+              </p>
+            </div>
+
+            <div className="overflow-x-auto rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-md">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-white/10 bg-slate-950/60 text-slate-300">
+                    <th className="p-3.5 sm:p-4 font-bold">Capability / Dimension</th>
+                    <th className="p-3.5 sm:p-4 font-bold text-cyan-400 bg-cyan-950/20">
+                      ⚡ BrandForge.ai Multi-Agent
+                    </th>
+                    <th className="p-3.5 sm:p-4 font-bold text-slate-400">Traditional Agency</th>
+                    <th className="p-3.5 sm:p-4 font-bold text-slate-400">Generic ChatGPT Prompt</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5 text-slate-300">
+                  <tr>
+                    <td className="p-3.5 sm:p-4 font-semibold text-white">
+                      Connected Multi-Stage Workflow
+                    </td>
+                    <td className="p-3.5 sm:p-4 font-bold text-emerald-400 bg-cyan-950/10">
+                      ✓ 6 Stages Passing Enriched State
+                    </td>
+                    <td className="p-3.5 sm:p-4 text-slate-400">Manual slides &amp; workshops</td>
+                    <td className="p-3.5 sm:p-4 text-rose-400">✗ Isolated single prompt</td>
+                  </tr>
+                  <tr>
+                    <td className="p-3.5 sm:p-4 font-semibold text-white">
+                      Adversarial Stress-Testing
+                    </td>
+                    <td className="p-3.5 sm:p-4 font-bold text-emerald-400 bg-cyan-950/10">
+                      ✓ 5-Agent Debate &amp; Consensus Loop
+                    </td>
+                    <td className="p-3.5 sm:p-4 text-slate-400">Limited to agency opinions</td>
+                    <td className="p-3.5 sm:p-4 text-rose-400">✗ Agreeable text generation</td>
+                  </tr>
+                  <tr>
+                    <td className="p-3.5 sm:p-4 font-semibold text-white">
+                      Quantitative Evaluation
+                    </td>
+                    <td className="p-3.5 sm:p-4 font-bold text-emerald-400 bg-cyan-950/10">
+                      ✓ Scikit-Learn RF (100 Trees) + DL Embeddings
+                    </td>
+                    <td className="p-3.5 sm:p-4 text-slate-400">Subjective gut-feel</td>
+                    <td className="p-3.5 sm:p-4 text-rose-400">✗ No calibrated metrics</td>
+                  </tr>
+                  <tr>
+                    <td className="p-3.5 sm:p-4 font-semibold text-white">
+                      Brand Guardian &amp; Cliché Scan
+                    </td>
+                    <td className="p-3.5 sm:p-4 font-bold text-emerald-400 bg-cyan-950/10">
+                      ✓ Real-time Copy Diagnostic &amp; Approved Rewrites
+                    </td>
+                    <td className="p-3.5 sm:p-4 text-slate-400">Monthly agency retainers</td>
+                    <td className="p-3.5 sm:p-4 text-rose-400">✗ Generates the clichés</td>
+                  </tr>
+                  <tr>
+                    <td className="p-3.5 sm:p-4 font-semibold text-white">
+                      Turnaround Time &amp; Cost
+                    </td>
+                    <td className="p-3.5 sm:p-4 font-bold text-cyan-300 bg-cyan-950/10">
+                      ⚡ Instant Launch Kit / Free Starter
+                    </td>
+                    <td className="p-3.5 sm:p-4 text-slate-400">4–8 Weeks ($10,000–$25,000)</td>
+                    <td className="p-3.5 sm:p-4 text-slate-400">Seconds (Low Quality)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>

@@ -10,7 +10,8 @@ import {
   VolumeX,
   Search,
   Bell,
-  Cpu
+  Cpu,
+  Globe
 } from 'lucide-react';
 import { BrandProject } from '@/types/brand';
 import { soundEngine } from '@/lib/sound-engine';
@@ -28,6 +29,7 @@ interface NavbarProps {
   onNavigateToStage: (stage: string) => void;
   onOpenCommandPalette: () => void;
   onReplayLoading: () => void;
+  onOpenLanding?: () => void;
   user: { name: string; email: string; role: string };
   onOpenAuth: () => void;
   onLogout: () => void;
@@ -44,6 +46,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onNavigateToStage,
   onOpenCommandPalette,
   onReplayLoading,
+  onOpenLanding,
   user,
   onOpenAuth,
   onLogout,
@@ -129,6 +132,21 @@ export const Navbar: React.FC<NavbarProps> = ({
             </select>
           </div>
 
+          {/* Landing Page Link */}
+          {onOpenLanding && (
+            <button
+              onClick={() => {
+                soundEngine.playClick();
+                onOpenLanding();
+              }}
+              className="hidden md:flex h-8 sm:h-9 items-center space-x-1.5 rounded-lg border border-cyan-500/30 bg-cyan-950/20 px-2.5 sm:px-3 text-xs font-semibold text-cyan-300 hover:bg-cyan-900/30 hover:border-cyan-400 transition-all shadow-sm"
+              title="Return to Landing Page"
+            >
+              <Globe className="h-3.5 w-3.5 text-cyan-400" />
+              <span>Landing Page</span>
+            </button>
+          )}
+
           {/* Forge New Idea Button */}
           <button
             onClick={onOpenNewModal}
@@ -212,6 +230,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             onLogout={onLogout}
             onReplayLoading={onReplayLoading}
             onOpenAuth={onOpenAuth}
+            onOpenLanding={onOpenLanding}
           />
         </div>
       </div>

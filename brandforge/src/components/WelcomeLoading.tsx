@@ -207,10 +207,11 @@ export const WelcomeLoading: React.FC<WelcomeLoadingProps> = ({ onComplete }) =>
 
           <button
             onClick={handleEnter}
-            className="flex items-center space-x-1 rounded-full border border-white/10 bg-slate-900/60 px-3.5 py-1.5 text-xs text-slate-400 hover:text-white hover:border-white/20 transition-all backdrop-blur-md"
+            className="flex items-center space-x-1.5 rounded-full border border-white/10 bg-slate-900/60 px-3.5 py-1.5 text-xs text-slate-400 hover:text-white hover:border-white/20 transition-all backdrop-blur-md"
+            title="Skip directly to Landing Page"
           >
-            <span>Skip</span>
-            <ArrowRight className="h-3 w-3" />
+            <span>Skip to Landing Page</span>
+            <ArrowRight className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
@@ -235,14 +236,14 @@ export const WelcomeLoading: React.FC<WelcomeLoadingProps> = ({ onComplete }) =>
           Multi-Agent Brand Intelligence
         </p>
         <p className="mt-1 text-xs text-slate-400">
-          Turning ideas into iconic brands
+          6-Stage Connected AI Pipeline • From Raw Idea to Launch-Ready System
         </p>
 
         {/* Progress Bar */}
         <div className="w-full mt-7 space-y-2">
           <div className="flex items-center justify-between text-xs">
             <span className="text-slate-300 font-medium">
-              {progress < 100 ? steps[Math.min(currentStep, 3)].label : 'Neural Engine Calibrated!'}
+              {progress < 100 ? steps[Math.min(currentStep, 3)].label : 'Neural Engine Ready!'}
             </span>
             <span className="font-mono text-cyan-300 font-extrabold text-sm">
               {Math.floor(progress)}%
@@ -295,7 +296,7 @@ export const WelcomeLoading: React.FC<WelcomeLoadingProps> = ({ onComplete }) =>
               onClick={handleEnter}
               className="w-full flex items-center justify-center space-x-2 rounded-2xl bg-gradient-to-r from-cyan-400 via-indigo-600 to-purple-600 px-6 py-3.5 text-xs font-extrabold text-white shadow-xl shadow-cyan-500/30 hover:from-cyan-300 hover:to-purple-500 transition-all transform hover:scale-[1.03] animate-bounce"
             >
-              <span>Enter BrandForge Platform</span>
+              <span>Explore BrandForge Landing Page</span>
               <ArrowRight className="h-4 w-4" />
             </button>
           ) : (
@@ -303,7 +304,7 @@ export const WelcomeLoading: React.FC<WelcomeLoadingProps> = ({ onComplete }) =>
               onClick={handleEnter}
               className="w-full flex items-center justify-center space-x-1.5 rounded-xl border border-white/10 bg-slate-900/60 px-4 py-2.5 text-xs font-medium text-slate-400 hover:text-slate-200 hover:border-white/20 transition-all"
             >
-              <span>Loading Workspace ({Math.floor(progress)}%)... Click to Open</span>
+              <span>Loading System ({Math.floor(progress)}%)... Click to Open Landing Page</span>
             </button>
           )}
         </div>

@@ -32,7 +32,7 @@ export default function Home() {
   const [projects, setProjects] = useState<BrandProject[]>(PRESET_PROJECTS);
   const [currentProjectId, setCurrentProjectId] = useState<string>(PRESET_PROJECTS[0].id);
   const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
-  const [showLanding, setShowLanding] = useState<boolean>(false);
+  const [showLanding, setShowLanding] = useState<boolean>(true);
   const [showWelcome, setShowWelcome] = useState<boolean>(true);
 
   // Auth & User Profile State
@@ -55,25 +55,9 @@ export default function Home() {
     provider: 'local',
   });
 
-  // Check if welcome screen has already played in this browser session
-  useEffect(() => {
-    try {
-      const hasSeenWelcome = sessionStorage.getItem('brandforge_welcome_seen');
-      if (hasSeenWelcome) {
-        setShowWelcome(false);
-      }
-    } catch {
-      // ignore
-    }
-  }, []);
-
   const handleFinishWelcome = () => {
     setShowWelcome(false);
-    try {
-      sessionStorage.setItem('brandforge_welcome_seen', 'true');
-    } catch {
-      // ignore
-    }
+    setShowLanding(true);
   };
 
   const handleReplayWelcome = () => {
@@ -228,6 +212,8 @@ export default function Home() {
 
   const handleLoginSuccess = (user: { name: string; email: string; role: string }) => {
     setCurrentUser(user);
+    setShowLanding(false);
+    setActiveTab('overview');
   };
 
   return (
@@ -250,6 +236,7 @@ export default function Home() {
         }}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         onReplayLoading={handleReplayWelcome}
+        onOpenLanding={() => setShowLanding(true)}
         user={currentUser}
         onOpenAuth={() => handleOpenAuth('login')}
         onLogout={() => {
@@ -293,16 +280,17 @@ export default function Home() {
 
       {showLanding ? (
         <LandingView
-          onStartBuilding={() => {
-            setShowLanding(false);
-            setIsNewModalOpen(true);
-          }}
+          onStartBuilding={() => handleOpenAuth('login')}
           onViewExample={() => {
             setCurrentProjectId('project-hackforge');
             setActiveTab('overview');
             setShowLanding(false);
           }}
           onOpenAuth={() => handleOpenAuth('login')}
+          onNavigateToDashboard={(tab) => {
+            if (tab) setActiveTab(tab as ActiveTab);
+            setShowLanding(false);
+          }}
         />
       ) : (
         <>
