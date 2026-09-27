@@ -2,12 +2,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { PRESET_PROJECTS } from '@/lib/brand-engine/presets';
-import { BrandProject, RawBrandInput } from '@/types/brand';
+import { BrandProject, RawBrandInput, Stage1Discover } from '@/types/brand';
 import { AIConfig } from '@/lib/brand-engine/llm-service';
 import { Navbar } from '@/components/Navbar';
 import { Sidebar, ActiveTab } from '@/components/Sidebar';
 import { StageProgress } from '@/components/StageProgress';
 import { LandingView } from '@/components/LandingView';
+import { WelcomeLoading } from '@/components/WelcomeLoading';
+import { AuthModal, AuthMode } from '@/components/auth/AuthModal';
+import { CommandPalette } from '@/components/CommandPalette';
+import { MobileNav } from '@/components/MobileNav';
 
 import { OverviewStage } from '@/components/stages/OverviewStage';
 import { DiscoverStage } from '@/components/stages/DiscoverStage';
@@ -29,7 +33,19 @@ export default function Home() {
   const [currentProjectId, setCurrentProjectId] = useState<string>(PRESET_PROJECTS[0].id);
   const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
   const [showLanding, setShowLanding] = useState<boolean>(false);
+  const [showWelcome, setShowWelcome] = useState<boolean>(true);
 
+  // Auth & User Profile State
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<AuthMode>('login');
+  const [currentUser, setCurrentUser] = useState({
+    name: 'Ranjeet Kumar',
+    email: 'rajranjeet7680@gmail.com',
+    role: 'Student Builder',
+  });
+
+  // Modals & Navigation
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -38,6 +54,31 @@ export default function Home() {
   const [aiConfig, setAiConfig] = useState<AIConfig>({
     provider: 'local',
   });
+
+  // Check if welcome screen has already played in this browser session
+  useEffect(() => {
+    try {
+      const hasSeenWelcome = sessionStorage.getItem('brandforge_welcome_seen');
+      if (hasSeenWelcome) {
+        setShowWelcome(false);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const handleFinishWelcome = () => {
+    setShowWelcome(false);
+    try {
+      sessionStorage.setItem('brandforge_welcome_seen', 'true');
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleReplayWelcome = () => {
+    setShowWelcome(true);
+  };
 
   // Load saved config and custom projects from localStorage
   useEffect(() => {
@@ -116,6 +157,20 @@ export default function Home() {
     setShowLanding(false);
   };
 
+  const handleUpdateDiscover = (updatedDiscover: Stage1Discover) => {
+    setProjects((prev) =>
+      prev.map((p) => {
+        if (p.id === currentProjectId) {
+          return {
+            ...p,
+            stage1Discover: updatedDiscover,
+          };
+        }
+        return p;
+      })
+    );
+  };
+
   const handleUpdateSelectedName = (newName: string) => {
     setProjects((prev) =>
       prev.map((p) => {
@@ -165,8 +220,21 @@ export default function Home() {
     );
   };
 
+  // Open Auth modal for specific flow
+  const handleOpenAuth = (mode: AuthMode = 'login') => {
+    setAuthMode(mode);
+    setIsAuthModalOpen(true);
+  };
+
+  const handleLoginSuccess = (user: { name: string; email: string; role: string }) => {
+    setCurrentUser(user);
+  };
+
   return (
     <div className="min-h-screen bg-[#090c15] text-slate-100 flex flex-col font-sans">
+      {/* 1. Cinematic Welcome Loading Screen (Plays first or on replay) */}
+      {showWelcome && <WelcomeLoading onComplete={handleFinishWelcome} />}
+
       {/* Top Navigation */}
       <Navbar
         currentProject={currentProject}
@@ -180,45 +248,61 @@ export default function Home() {
           setActiveTab(tab as ActiveTab);
           setShowLanding(false);
         }}
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        onReplayLoading={handleReplayWelcome}
+        user={currentUser}
+        onOpenAuth={() => handleOpenAuth('login')}
+        onLogout={() => {
+          handleOpenAuth('login');
+        }}
       />
 
-      {/* Top Banner toggle for Landing vs Dashboard */}
+      {/* Top Banner Mode Switcher (Landing vs Workspace) */}
       <div className="no-print bg-[#0b0f1a] border-b border-white/5 px-4 py-1.5 flex items-center justify-between text-[11px] text-slate-400">
         <div className="flex items-center space-x-2">
           <span>Mode:</span>
           <button
             onClick={() => setShowLanding(false)}
-            className={`rounded px-2 py-0.5 font-medium transition-colors ${
-              !showLanding ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+            className={`rounded px-2.5 py-0.5 font-medium transition-colors ${
+              !showLanding ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
             }`}
           >
-            Workspace Dashboard
+            Dashboard Workspace
           </button>
           <button
             onClick={() => setShowLanding(true)}
-            className={`rounded px-2 py-0.5 font-medium transition-colors ${
-              showLanding ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+            className={`rounded px-2.5 py-0.5 font-medium transition-colors ${
+              showLanding ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
             }`}
           >
-            Landing Presentation
+            Product Landing Page
           </button>
         </div>
 
         <div className="hidden sm:flex items-center space-x-3">
-          <span>Inkloom AI Brand Intelligence Engine</span>
+          <span>Inkloom Multi-Agent Brand Engine</span>
           <span>•</span>
-          <span className="text-emerald-400">6 Stages Validated</span>
+          <button
+            onClick={() => setIsCommandPaletteOpen(true)}
+            className="text-cyan-400 hover:text-cyan-300 font-mono"
+          >
+            Press Ctrl + K for Fast Search
+          </button>
         </div>
       </div>
 
       {showLanding ? (
         <LandingView
-          onStartBuilding={() => setIsNewModalOpen(true)}
+          onStartBuilding={() => {
+            setShowLanding(false);
+            setIsNewModalOpen(true);
+          }}
           onViewExample={() => {
             setCurrentProjectId('project-hackforge');
             setActiveTab('overview');
             setShowLanding(false);
           }}
+          onOpenAuth={() => handleOpenAuth('login')}
         />
       ) : (
         <>
@@ -242,16 +326,19 @@ export default function Home() {
                 }
               }}
               project={currentProject}
+              onOpenNewModal={() => setIsNewModalOpen(true)}
             />
 
             {/* Dynamic Stage View Container */}
-            <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-8 lg:px-10">
+            <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-8 lg:px-10 pb-24 md:pb-12">
               <div className="mx-auto max-w-6xl">
                 {activeTab === 'overview' && (
                   <OverviewStage
                     project={currentProject}
                     setActiveTab={setActiveTab}
                     onOpenExportModal={() => setIsExportModalOpen(true)}
+                    onOpenNewModal={() => setIsNewModalOpen(true)}
+                    onSelectProject={handleSelectProject}
                   />
                 )}
 
@@ -261,6 +348,7 @@ export default function Home() {
                     rawIdea={currentProject.rawInput.idea}
                     targetMarket={currentProject.rawInput.targetMarket}
                     onProceedToNext={() => setActiveTab('position')}
+                    onUpdateDiscover={handleUpdateDiscover}
                   />
                 )}
 
@@ -329,10 +417,33 @@ export default function Home() {
               </div>
             </main>
           </div>
+
+          {/* Mobile Bottom Navigation */}
+          <MobileNav activeTab={activeTab} setActiveTab={setActiveTab} />
         </>
       )}
 
-      {/* Modals */}
+      {/* Modals & Command Palette */}
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        projects={projects}
+        onSelectProject={handleSelectProject}
+        onNavigateToStage={(tab) => {
+          setActiveTab(tab as ActiveTab);
+          setShowLanding(false);
+        }}
+        onOpenNewModal={() => setIsNewModalOpen(true)}
+        onOpenSettingsModal={() => setIsSettingsModalOpen(true)}
+      />
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        initialMode={authMode}
+        onLoginSuccess={handleLoginSuccess}
+      />
+
       <NewProjectModal
         isOpen={isNewModalOpen}
         onClose={() => setIsNewModalOpen(false)}
