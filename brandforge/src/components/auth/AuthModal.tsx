@@ -16,6 +16,7 @@ import {
   Rocket
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { motion } from 'framer-motion';
 import { soundEngine } from '@/lib/sound-engine';
 
 export type AuthMode = 'login' | 'signup' | 'otp' | 'forgot-password' | 'onboarding';
@@ -44,6 +45,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [role, setRole] = useState('Student Builder');
   const [company, setCompany] = useState('Inkloom Cohort');
   const [agreeTerms, setAgreeTerms] = useState(true);
+  const [resetSent, setResetSent] = useState(false);
 
   // OTP State
   const [otpValues, setOtpValues] = useState<string[]>(['4', '2', '8', '1', '9', '6']);
@@ -158,7 +160,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-white/10 bg-[#0b0e19] p-7 shadow-2xl shadow-indigo-950/70">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.94, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.94, y: 16 }}
+        transition={{ type: 'spring', stiffness: 450, damping: 32 }}
+        className="relative w-full max-w-md overflow-hidden rounded-[28px] border border-white/[0.12] bg-[#0b0e19]/95 backdrop-blur-2xl p-7 shadow-2xl shadow-indigo-950/70"
+      >
+        {/* iOS Sheet Grabber Handle */}
+        <div className="ios-grabber mb-4" />
+
         {/* Glow decoration */}
         <div className="absolute -right-20 -top-20 h-48 w-48 rounded-full bg-indigo-600/20 blur-3xl pointer-events-none" />
         <div className="absolute -left-20 -bottom-20 h-48 w-48 rounded-full bg-cyan-600/20 blur-3xl pointer-events-none" />
@@ -691,55 +702,81 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               </p>
             </div>
 
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                soundEngine.playSuccessChord();
-                alert(`Reset instructions sent to ${email}`);
-                setMode('login');
-              }}
-              className="space-y-3.5"
-            >
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Email address</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    placeholder="you@example.com"
-                    className="w-full rounded-xl border border-white/10 bg-slate-900/90 pl-9 pr-3 py-2.5 text-xs text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
-                  />
+            {resetSent ? (
+              <div className="rounded-2xl border border-emerald-500/20 bg-emerald-950/20 p-5 text-center space-y-3 animate-fadeIn">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 shadow-lg">
+                  <CheckCircle2 className="h-6 w-6" />
                 </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white">Reset Link Dispatched</h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Instructions sent to <span className="text-indigo-300 font-mono font-medium">{email}</span>. Check your inbox.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    soundEngine.playClick();
+                    setResetSent(false);
+                    setMode('login');
+                  }}
+                  className="w-full rounded-xl bg-indigo-600 py-2.5 text-xs font-semibold text-white hover:bg-indigo-500 transition-all shadow-md"
+                >
+                  Return to Sign In
+                </button>
               </div>
-
-              <button
-                type="submit"
-                className="w-full flex items-center justify-center space-x-2 rounded-xl bg-indigo-600 py-2.5 text-xs font-bold text-white shadow-lg hover:bg-indigo-500 transition-all"
-              >
-                <span>Send Reset Link</span>
-                <ArrowRight className="h-4 w-4" />
-              </button>
-            </form>
-
-            <div className="text-center text-xs text-slate-400 pt-1">
-              Remember your password?{' '}
-              <button
-                type="button"
-                onClick={() => {
-                  soundEngine.playClick();
-                  setMode('login');
+            ) : (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  soundEngine.playSuccessChord();
+                  setResetSent(true);
                 }}
-                className="text-indigo-400 hover:text-indigo-300 font-semibold"
+                className="space-y-3.5"
               >
-                Back to Sign In
-              </button>
-            </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Email address</label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      placeholder="you@example.com"
+                      className="w-full rounded-xl border border-white/10 bg-slate-900/90 pl-9 pr-3 py-2.5 text-xs text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full flex items-center justify-center space-x-2 rounded-xl bg-indigo-600 py-2.5 text-xs font-bold text-white shadow-lg hover:bg-indigo-500 transition-all"
+                >
+                  <span>Send Reset Link</span>
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </form>
+            )}
+
+            {!resetSent && (
+              <div className="text-center text-xs text-slate-400 pt-1">
+                Remember your password?{' '}
+                <button
+                  type="button"
+                  onClick={() => {
+                    soundEngine.playClick();
+                    setMode('login');
+                  }}
+                  className="text-indigo-400 hover:text-indigo-300 font-semibold"
+                >
+                  Back to Sign In
+                </button>
+              </div>
+            )}
           </div>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 };

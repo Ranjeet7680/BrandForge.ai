@@ -56,6 +56,33 @@ class SoundEngine {
     }
   }
 
+  // 1b. Ultra-subtle haptic tick for sliders and discrete controls
+  public playTick() {
+    if (!this.soundEnabled) return;
+    try {
+      this.initContext();
+      if (!this.ctx) return;
+
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1200, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.015);
+
+      gain.gain.setValueAtTime(0.04 * this.volume, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.015);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.02);
+    } catch {
+      // ignore
+    }
+  }
+
   // 2. Celebratory Major Triad Chord for Stage Deliveries
   public playSuccessChord() {
     if (!this.soundEnabled) return;

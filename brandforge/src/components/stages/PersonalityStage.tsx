@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import {
   Sparkles,
   Ban,
@@ -12,9 +13,11 @@ import {
   X,
   ArrowRight,
   Copy,
-  ShieldCheck
+  ShieldCheck,
+  RotateCcw
 } from 'lucide-react';
 import { Stage3Shape } from '@/types/brand';
+import { soundEngine } from '@/lib/sound-engine';
 
 interface PersonalityStageProps {
   shape: Stage3Shape;
@@ -29,21 +32,39 @@ export const PersonalityStage: React.FC<PersonalityStageProps> = ({
   onUpdateSelectedTagline,
   onProceedToNext,
 }) => {
-  const [selectedName, setSelectedName] = React.useState(shape.selectedBrandName);
-  const [selectedTagline, setSelectedTagline] = React.useState(shape.selectedTagline);
-  const [copiedKey, setCopiedKey] = React.useState<string | null>(null);
+  const [selectedName, setSelectedName] = useState(shape.selectedBrandName);
+  const [selectedTagline, setSelectedTagline] = useState(shape.selectedTagline);
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [attributes, setAttributes] = useState(shape.brandVoice.attributes);
 
   const handleNameSelect = (name: string) => {
+    soundEngine.playClick();
     setSelectedName(name);
     if (onUpdateSelectedName) onUpdateSelectedName(name);
   };
 
   const handleTaglineSelect = (tagline: string) => {
+    soundEngine.playClick();
     setSelectedTagline(tagline);
     if (onUpdateSelectedTagline) onUpdateSelectedTagline(tagline);
   };
 
+  const handleSliderChange = (idx: number, newVal: number) => {
+    setAttributes((prev) => {
+      const next = [...prev];
+      next[idx] = { ...next[idx], value: newVal };
+      return next;
+    });
+    soundEngine.playTick();
+  };
+
+  const handleResetSliders = () => {
+    soundEngine.playClick();
+    setAttributes(shape.brandVoice.attributes);
+  };
+
   const copyText = (text: string, key: string) => {
+    soundEngine.playClick();
     navigator.clipboard.writeText(text);
     setCopiedKey(key);
     setTimeout(() => setCopiedKey(null), 2000);
@@ -339,26 +360,46 @@ export const PersonalityStage: React.FC<PersonalityStageProps> = ({
       {/* Brand Voice Sliders & Dos/Don'ts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Sliders */}
-        <div className="rounded-xl border border-white/10 bg-slate-900/60 p-6 space-y-4">
-          <div className="flex items-center space-x-2">
-            <Sliders className="h-5 w-5 text-indigo-400" />
-            <h2 className="text-base font-bold text-white tracking-tight">
-              Brand Voice Sliders
-            </h2>
+        <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Sliders className="h-5 w-5 text-indigo-400" />
+              <h2 className="text-base font-bold text-white tracking-tight">
+                Brand Voice Sliders
+              </h2>
+            </div>
+            <button
+              onClick={handleResetSliders}
+              className="flex items-center space-x-1 text-[11px] font-medium text-slate-400 hover:text-indigo-300 transition-colors"
+              title="Reset to default voice settings"
+            >
+              <RotateCcw className="h-3 w-3" />
+              <span>Reset</span>
+            </button>
           </div>
 
-          <div className="space-y-4 pt-2">
-            {shape.brandVoice.attributes.map((attr, idx) => (
-              <div key={idx} className="space-y-1.5">
-                <div className="flex justify-between text-xs font-medium">
-                  <span className="text-slate-400">{attr.leftLabel}</span>
-                  <span className="font-mono text-indigo-300 font-bold">{attr.value}%</span>
-                  <span className="text-slate-400">{attr.rightLabel}</span>
+          <p className="text-xs text-slate-400">
+            Drag sliders to tune the brand&apos;s personality spectrum in real time.
+          </p>
+
+          <div className="space-y-3 pt-1">
+            {attributes.map((attr, idx) => (
+              <div key={idx} className="space-y-2 rounded-xl bg-black/20 border border-white/5 p-3">
+                <div className="flex justify-between items-center text-xs font-medium">
+                  <span className="text-slate-300 font-semibold">{attr.leftLabel}</span>
+                  <span className="font-mono text-xs rounded-full bg-indigo-500/20 px-2 py-0.5 text-indigo-300 font-bold border border-indigo-500/30">
+                    {attr.value}%
+                  </span>
+                  <span className="text-slate-300 font-semibold">{attr.rightLabel}</span>
                 </div>
-                <div className="relative h-2 w-full rounded-full bg-slate-800 overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
-                    style={{ width: `${attr.value}%` }}
+                <div className="relative flex items-center">
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={attr.value}
+                    onChange={(e) => handleSliderChange(idx, Number(e.target.value))}
+                    className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500 hover:accent-indigo-400 transition-all"
                   />
                 </div>
               </div>

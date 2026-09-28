@@ -7,6 +7,7 @@ import {
   ArrowRight,
   Loader2
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { RawBrandInput } from '@/types/brand';
 
 interface NewProjectModalProps {
@@ -73,12 +74,21 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
-      <div className="relative w-full max-w-2xl rounded-2xl border border-white/10 bg-[#0d1220] p-6 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.94, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.94, y: 16 }}
+        transition={{ type: 'spring', stiffness: 450, damping: 32 }}
+        className="relative w-full max-w-2xl rounded-[28px] border border-white/[0.12] bg-[#0c1122]/95 backdrop-blur-3xl p-6 sm:p-7 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto"
+      >
+        {/* iOS Sheet Grabber Handle */}
+        <div className="ios-grabber mb-2" />
+
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-white/10">
-          <div className="flex items-center space-x-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-400">
+        <div className="flex items-center justify-between pb-3 border-b border-white/10">
+          <div className="flex items-center space-x-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-500 text-white shadow-md">
               <Sparkles className="h-4 w-4" />
             </div>
             <div>
@@ -92,9 +102,9 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+            className="rounded-full p-1.5 text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
@@ -104,10 +114,11 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
             ⚡ Quick-Load Realistic Presets
           </span>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <button
+            <motion.button
+              whileTap={{ scale: 0.94 }}
               type="button"
               onClick={() => handleSelectPresetTemplate('hackathon')}
-              className="rounded-lg border border-indigo-500/30 bg-indigo-500/10 p-2.5 text-left hover:bg-indigo-500/20 transition-all group"
+              className="rounded-2xl border border-indigo-500/30 bg-indigo-500/10 p-2.5 text-left hover:bg-indigo-500/20 transition-all group"
             >
               <span className="text-xs font-bold text-indigo-300 group-hover:text-white block">
                 HackForge
@@ -115,12 +126,13 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
               <span className="text-[10px] text-slate-400 block truncate">
                 Hackathon Teammates
               </span>
-            </button>
+            </motion.button>
 
-            <button
+            <motion.button
+              whileTap={{ scale: 0.94 }}
               type="button"
               onClick={() => handleSelectPresetTemplate('finance')}
-              className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-2.5 text-left hover:bg-emerald-500/20 transition-all group"
+              className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-2.5 text-left hover:bg-emerald-500/20 transition-all group"
             >
               <span className="text-xs font-bold text-emerald-300 group-hover:text-white block">
                 LedgerLens
@@ -128,12 +140,13 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
               <span className="text-[10px] text-slate-400 block truncate">
                 SME Financial Co-pilot
               </span>
-            </button>
+            </motion.button>
 
-            <button
+            <motion.button
+              whileTap={{ scale: 0.94 }}
               type="button"
               onClick={() => handleSelectPresetTemplate('sneaker')}
-              className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-2.5 text-left hover:bg-amber-500/20 transition-all group"
+              className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-2.5 text-left hover:bg-amber-500/20 transition-all group"
             >
               <span className="text-xs font-bold text-amber-300 group-hover:text-white block">
                 Modular Kicks
@@ -141,12 +154,13 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
               <span className="text-[10px] text-slate-400 block truncate">
                 Zero-Waste Sneakers
               </span>
-            </button>
+            </motion.button>
 
-            <button
+            <motion.button
+              whileTap={{ scale: 0.94 }}
               type="button"
               onClick={() => handleSelectPresetTemplate('dev')}
-              className="rounded-lg border border-purple-500/30 bg-purple-500/10 p-2.5 text-left hover:bg-purple-500/20 transition-all group"
+              className="rounded-2xl border border-purple-500/30 bg-purple-500/10 p-2.5 text-left hover:bg-purple-500/20 transition-all group"
             >
               <span className="text-xs font-bold text-purple-300 group-hover:text-white block">
                 DevPulse
@@ -154,7 +168,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
               <span className="text-[10px] text-slate-400 block truncate">
                 Solo Dev Architect
               </span>
-            </button>
+            </motion.button>
           </div>
         </div>
 
@@ -247,15 +261,16 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg px-4 py-2 text-xs font-medium text-slate-400 hover:text-white"
+              className="rounded-xl px-4 py-2 text-xs font-medium text-slate-400 hover:text-white transition-colors"
             >
               Cancel
             </button>
 
-            <button
+            <motion.button
+              whileTap={{ scale: 0.95 }}
               type="submit"
               disabled={isLoading || !formData.idea.trim()}
-              className="flex items-center space-x-2 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 px-6 py-2.5 text-xs font-semibold text-white shadow-lg shadow-indigo-500/25 hover:from-indigo-500 hover:to-purple-500 transition-all disabled:opacity-50"
+              className="flex items-center space-x-2 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 px-6 py-2.5 text-xs font-bold text-white shadow-lg shadow-indigo-500/25 hover:from-indigo-500 hover:to-cyan-400 transition-all disabled:opacity-50"
             >
               {isLoading ? (
                 <>
@@ -269,10 +284,10 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}
-            </button>
+            </motion.button>
           </div>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 };

@@ -14,6 +14,7 @@ import {
   Check,
   FileText
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { BrandProject } from '@/types/brand';
 import { auditMarketingAsset, GuardianAssetAuditResult } from '@/lib/ml/guardian-client';
 import { soundEngine } from '@/lib/sound-engine';
@@ -157,22 +158,27 @@ export const GuardianStage: React.FC<GuardianStageProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center space-x-2 self-start sm:self-auto">
-          <button
+        <div className="flex items-center space-x-2.5 self-start sm:self-auto">
+          <motion.button
+            whileTap={{ scale: 0.94 }}
             onClick={runVerification}
             disabled={isVerifying}
-            className="flex items-center space-x-1.5 rounded-lg border border-white/10 bg-slate-800 px-3.5 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700 transition-colors shadow-sm disabled:opacity-50"
+            className="flex items-center space-x-1.5 rounded-2xl border border-white/10 bg-slate-800/80 px-4 py-2.5 text-xs font-bold text-slate-200 hover:bg-slate-700 transition-all shadow-sm disabled:opacity-50"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${isVerifying ? 'animate-spin' : ''}`} />
             <span>{isVerifying ? 'Auditing System...' : 'Re-Run System Audit'}</span>
-          </button>
-          <button
-            onClick={onProceedToDeliver}
-            className="flex items-center space-x-1.5 rounded-lg bg-indigo-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-indigo-500 transition-colors shadow-sm"
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.94 }}
+            onClick={() => {
+              soundEngine.playClick();
+              onProceedToDeliver();
+            }}
+            className="flex items-center space-x-1.5 rounded-2xl bg-gradient-to-r from-teal-600 to-indigo-600 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-teal-600/25 hover:from-teal-500 hover:to-indigo-500 transition-all"
           >
             <span>Proceed to Launch Kit</span>
             <ArrowRight className="h-3.5 w-3.5" />
-          </button>
+          </motion.button>
         </div>
       </div>
 

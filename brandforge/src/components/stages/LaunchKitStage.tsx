@@ -36,7 +36,9 @@ const TwitterIcon: React.FC<{ className?: string }> = ({ className = 'h-4 w-4' }
   </svg>
 );
 import confetti from 'canvas-confetti';
+import { motion } from 'framer-motion';
 import { BrandProject } from '@/types/brand';
+import { soundEngine } from '@/lib/sound-engine';
 
 interface LaunchKitStageProps {
   project: BrandProject;
@@ -67,12 +69,14 @@ export const LaunchKitStage: React.FC<LaunchKitStageProps> = ({
   }, []);
 
   const copyText = (text: string, key: string) => {
+    soundEngine.playClick();
     navigator.clipboard.writeText(text);
     setCopiedKey(key);
     setTimeout(() => setCopiedKey(null), 2000);
   };
 
   const handlePrint = () => {
+    soundEngine.playClick();
     window.print();
   };
 
@@ -171,26 +175,32 @@ ${kit.marketingAssets.launchAnnouncement}
         </div>
 
         {/* Global Export Buttons */}
-        <div className="flex items-center space-x-2 self-start sm:self-auto">
+        <div className="flex items-center space-x-2 self-start sm:self-auto flex-wrap gap-y-2">
           <button
-            onClick={downloadMarkdown}
-            className="flex items-center space-x-1.5 rounded-lg border border-white/10 bg-slate-800 px-3.5 py-2 text-xs font-medium text-slate-200 hover:bg-slate-700 transition-colors shadow-sm"
+            onClick={() => {
+              soundEngine.playSuccessChord();
+              downloadMarkdown();
+            }}
+            className="flex items-center space-x-1.5 rounded-xl border border-white/10 bg-slate-800/90 px-3.5 py-2 text-xs font-medium text-slate-200 hover:bg-slate-700 transition-colors shadow-sm"
           >
-            <Download className="h-3.5 w-3.5" />
+            <Download className="h-3.5 w-3.5 text-indigo-400" />
             <span>Export Markdown</span>
           </button>
 
           <button
             onClick={handlePrint}
-            className="flex items-center space-x-1.5 rounded-lg border border-white/10 bg-slate-800 px-3.5 py-2 text-xs font-medium text-slate-200 hover:bg-slate-700 transition-colors shadow-sm"
+            className="flex items-center space-x-1.5 rounded-xl border border-white/10 bg-slate-800/90 px-3.5 py-2 text-xs font-medium text-slate-200 hover:bg-slate-700 transition-colors shadow-sm"
           >
-            <Printer className="h-3.5 w-3.5" />
+            <Printer className="h-3.5 w-3.5 text-emerald-400" />
             <span>Print PDF</span>
           </button>
 
           <button
-            onClick={onOpenExportModal}
-            className="flex items-center space-x-1.5 rounded-lg bg-indigo-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-indigo-500 transition-colors shadow-sm"
+            onClick={() => {
+              soundEngine.playClick();
+              onOpenExportModal();
+            }}
+            className="flex items-center space-x-1.5 rounded-xl bg-indigo-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-indigo-500 transition-colors shadow-sm"
           >
             <Share2 className="h-3.5 w-3.5" />
             <span>Share Kit</span>
@@ -198,55 +208,41 @@ ${kit.marketingAssets.launchAnnouncement}
         </div>
       </div>
 
-      {/* Nav Tabs for Launch Kit Categories */}
-      <div className="flex items-center space-x-2 border-b border-white/10 pb-3 overflow-x-auto scrollbar-none">
-        <button
-          onClick={() => setActiveTab('marketing')}
-          className={`flex items-center space-x-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all flex-shrink-0 ${
-            activeTab === 'marketing'
-              ? 'bg-indigo-600 text-white shadow-sm glow-indigo'
-              : 'bg-slate-900/60 text-slate-400 hover:text-white'
-          }`}
-        >
-          <FileText className="h-3.5 w-3.5" />
-          <span>Marketing &amp; Launch Copy</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('strategy')}
-          className={`flex items-center space-x-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all flex-shrink-0 ${
-            activeTab === 'strategy'
-              ? 'bg-indigo-600 text-white shadow-sm glow-indigo'
-              : 'bg-slate-900/60 text-slate-400 hover:text-white'
-          }`}
-        >
-          <Target className="h-3.5 w-3.5" />
-          <span>Brand Strategy</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('identity')}
-          className={`flex items-center space-x-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all flex-shrink-0 ${
-            activeTab === 'identity'
-              ? 'bg-indigo-600 text-white shadow-sm glow-indigo'
-              : 'bg-slate-900/60 text-slate-400 hover:text-white'
-          }`}
-        >
-          <Sparkles className="h-3.5 w-3.5" />
-          <span>Brand Identity</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('visual')}
-          className={`flex items-center space-x-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all flex-shrink-0 ${
-            activeTab === 'visual'
-              ? 'bg-indigo-600 text-white shadow-sm glow-indigo'
-              : 'bg-slate-900/60 text-slate-400 hover:text-white'
-          }`}
-        >
-          <Palette className="h-3.5 w-3.5" />
-          <span>Visual Specs</span>
-        </button>
+      {/* iOS Segmented Control for Launch Kit Categories */}
+      <div className="ios-segmented-trough p-1.5 rounded-2xl flex items-center space-x-1 overflow-x-auto scrollbar-none max-w-2xl">
+        {[
+          { id: 'marketing', label: 'Marketing Copy', icon: FileText },
+          { id: 'strategy', label: 'Brand Strategy', icon: Target },
+          { id: 'identity', label: 'Brand Identity', icon: Sparkles },
+          { id: 'visual', label: 'Visual Specs', icon: Palette },
+        ].map((tab) => {
+          const isActive = activeTab === tab.id;
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => {
+                soundEngine.playClick();
+                setActiveTab(tab.id as any);
+              }}
+              className={`relative flex items-center space-x-2 rounded-xl px-3.5 py-2 text-xs font-semibold transition-all flex-1 justify-center whitespace-nowrap ${
+                isActive ? 'text-white' : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {isActive && (
+                <motion.div
+                  layoutId="activeLaunchKitTab"
+                  className="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 shadow-md"
+                  transition={{ type: 'spring', stiffness: 450, damping: 35 }}
+                />
+              )}
+              <span className="relative z-10 flex items-center space-x-1.5">
+                <Icon className="h-3.5 w-3.5" />
+                <span>{tab.label}</span>
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Tab 1: Marketing & Launch Copy */}

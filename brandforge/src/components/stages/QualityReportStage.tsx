@@ -68,24 +68,152 @@ export const QualityReportStage: React.FC<QualityReportStageProps> = ({
 
   const downloadSqlSchema = async () => {
     soundEngine.playClick();
+    const fallbackSql = `-- BrandForge Production Relational Database Schema
+-- 13 Tables with Complete Foreign Keys and Indexes (PostgreSQL / SQLite)
+
+CREATE TABLE IF NOT EXISTS users (
+    id VARCHAR(64) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    role VARCHAR(100) DEFAULT 'Student Builder',
+    tier VARCHAR(50) DEFAULT 'pro',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS brand_projects (
+    id VARCHAR(64) PRIMARY KEY,
+    user_id VARCHAR(64) REFERENCES users(id),
+    name VARCHAR(255) NOT NULL,
+    category VARCHAR(100) NOT NULL,
+    tagline TEXT,
+    pitch TEXT,
+    health_score INT DEFAULT 90,
+    progress INT DEFAULT 100,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS stage1_discover (
+    id VARCHAR(64) PRIMARY KEY,
+    project_id VARCHAR(64) REFERENCES brand_projects(id) ON DELETE CASCADE,
+    core_problem TEXT NOT NULL,
+    target_market TEXT NOT NULL,
+    pain_points JSON,
+    jobs_to_be_done JSON,
+    assumptions JSON
+);
+
+CREATE TABLE IF NOT EXISTS stage2_position (
+    id VARCHAR(64) PRIMARY KEY,
+    project_id VARCHAR(64) REFERENCES brand_projects(id) ON DELETE CASCADE,
+    category VARCHAR(255) NOT NULL,
+    value_proposition TEXT NOT NULL,
+    positioning_statement TEXT NOT NULL,
+    elevator_pitch TEXT,
+    moat_quadrant JSON
+);
+
+CREATE TABLE IF NOT EXISTS stage3_shape (
+    id VARCHAR(64) PRIMARY KEY,
+    project_id VARCHAR(64) REFERENCES brand_projects(id) ON DELETE CASCADE,
+    personality_traits JSON,
+    traits_to_avoid JSON,
+    naming_territories JSON,
+    brand_voice JSON
+);
+
+CREATE TABLE IF NOT EXISTS stage4_visualize (
+    id VARCHAR(64) PRIMARY KEY,
+    project_id VARCHAR(64) REFERENCES brand_projects(id) ON DELETE CASCADE,
+    color_palette JSON,
+    typography JSON,
+    logo_concept JSON,
+    imagery_direction JSON
+);
+
+CREATE TABLE IF NOT EXISTS stage5_critic (
+    id VARCHAR(64) PRIMARY KEY,
+    project_id VARCHAR(64) REFERENCES brand_projects(id) ON DELETE CASCADE,
+    overall_health_score INT NOT NULL,
+    critique_points JSON
+);
+
+CREATE TABLE IF NOT EXISTS stage6_launch_kit (
+    id VARCHAR(64) PRIMARY KEY,
+    project_id VARCHAR(64) REFERENCES brand_projects(id) ON DELETE CASCADE,
+    marketing_assets JSON,
+    brand_strategy_summary JSON,
+    brand_identity_summary JSON
+);
+
+CREATE TABLE IF NOT EXISTS brand_battles (
+    id VARCHAR(64) PRIMARY KEY,
+    project_id VARCHAR(64) REFERENCES brand_projects(id) ON DELETE CASCADE,
+    debate_rounds JSON,
+    guardian_audit JSON
+);
+
+CREATE TABLE IF NOT EXISTS guardian_audits (
+    id VARCHAR(64) PRIMARY KEY,
+    project_id VARCHAR(64) REFERENCES brand_projects(id) ON DELETE CASCADE,
+    asset_type VARCHAR(50),
+    draft_text TEXT,
+    score INT,
+    status VARCHAR(50),
+    revised_suggestion TEXT
+);
+
+CREATE TABLE IF NOT EXISTS ml_quality_evaluations (
+    id VARCHAR(64) PRIMARY KEY,
+    project_id VARCHAR(64) REFERENCES brand_projects(id) ON DELETE CASCADE,
+    predicted_quality_score FLOAT,
+    semantic_coherence FLOAT,
+    feature_importances JSON
+);
+
+CREATE TABLE IF NOT EXISTS brand_assets (
+    id VARCHAR(64) PRIMARY KEY,
+    project_id VARCHAR(64) REFERENCES brand_projects(id) ON DELETE CASCADE,
+    asset_name VARCHAR(255),
+    file_type VARCHAR(50),
+    content TEXT
+);
+
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id VARCHAR(64) PRIMARY KEY,
+    project_id VARCHAR(64) REFERENCES brand_projects(id),
+    action VARCHAR(255),
+    performed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+`;
+
     try {
       const res = await fetch('http://127.0.0.1:8000/api/export/schema.sql');
       if (res.ok) {
         const json = await res.json();
-        const blob = new Blob([json.content], { type: 'text/sql;charset=utf-8' });
+        const blob = new Blob([json.content || fallbackSql], { type: 'text/sql;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'brandforge_schema.sql';
+        a.download = 'brandforge_production_schema.sql';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+        soundEngine.playSuccessChord();
         return;
       }
     } catch {
-      // fallback
+      // Backend not running, execute instant direct client download
     }
-    alert('SQL Schema downloaded from backend/database/schema.sql');
+
+    const blob = new Blob([fallbackSql], { type: 'text/sql;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'brandforge_production_schema.sql';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    soundEngine.playSuccessChord();
   };
 
   const compositeScore = rfData && dlData

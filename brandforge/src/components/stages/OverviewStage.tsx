@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import {
   Compass,
   Crosshair,
@@ -26,6 +27,7 @@ interface OverviewStageProps {
   onOpenExportModal: () => void;
   onOpenNewModal?: () => void;
   onSelectProject?: (id: string) => void;
+  onOpenCommandPalette?: () => void;
 }
 
 export const OverviewStage: React.FC<OverviewStageProps> = ({
@@ -34,8 +36,10 @@ export const OverviewStage: React.FC<OverviewStageProps> = ({
   onOpenExportModal,
   onOpenNewModal,
   onSelectProject,
+  onOpenCommandPalette,
 }) => {
   const [copied, setCopied] = useState(false);
+  const [showAllProjectsModal, setShowAllProjectsModal] = useState(false);
 
   const copyPitch = () => {
     soundEngine.playClick();
@@ -122,47 +126,51 @@ export const OverviewStage: React.FC<OverviewStageProps> = ({
 
             {/* Action Buttons */}
             <div className="flex flex-wrap items-center gap-2.5 pt-1">
-              <button
+              <motion.button
+                whileTap={{ scale: 0.94 }}
                 onClick={() => {
                   soundEngine.playClick();
                   setActiveTab('discover');
                 }}
-                className="flex items-center space-x-2 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow-lg shadow-indigo-600/30 hover:from-indigo-500 hover:to-purple-500 transition-all hover:scale-105"
+                className="flex items-center space-x-2 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 px-5 py-2.5 text-xs font-bold text-white shadow-lg shadow-indigo-600/30 hover:from-indigo-500 hover:to-cyan-400 transition-all"
               >
-                <span>Continue Project</span>
+                <span>Continue Pipeline</span>
                 <ArrowRight className="h-4 w-4" />
-              </button>
+              </motion.button>
 
-              <button
+              <motion.button
+                whileTap={{ scale: 0.94 }}
                 onClick={() => {
                   soundEngine.playClick();
                   setActiveTab('battle');
                 }}
-                className="flex items-center space-x-1.5 rounded-xl border border-purple-500/40 bg-purple-500/15 px-4 py-2.5 text-xs font-semibold text-purple-300 hover:bg-purple-500/25 transition-all"
+                className="flex items-center space-x-1.5 rounded-2xl border border-purple-500/40 bg-purple-500/15 px-4 py-2.5 text-xs font-semibold text-purple-300 hover:bg-purple-500/25 transition-all"
               >
                 <Flame className="h-4 w-4 text-purple-400" />
                 <span>Launch Brand Battle</span>
-              </button>
+              </motion.button>
 
-              <button
+              <motion.button
+                whileTap={{ scale: 0.94 }}
                 onClick={() => {
                   soundEngine.playClick();
                   onOpenExportModal();
                 }}
-                className="flex items-center space-x-1.5 rounded-xl border border-white/10 bg-slate-900/80 px-4 py-2.5 text-xs font-semibold text-slate-200 hover:bg-slate-800 transition-all"
+                className="flex items-center space-x-1.5 rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-2.5 text-xs font-semibold text-slate-200 hover:bg-slate-800 transition-all"
               >
                 <Download className="h-3.5 w-3.5 text-slate-400" />
                 <span>Export Launch Kit</span>
-              </button>
+              </motion.button>
 
-              <button
+              <motion.button
+                whileTap={{ scale: 0.94 }}
                 onClick={copyPitch}
-                className="flex items-center space-x-1.5 rounded-xl border border-white/10 bg-slate-900/80 px-3.5 py-2.5 text-xs font-semibold text-slate-300 hover:bg-slate-800 transition-all"
+                className="flex items-center space-x-1.5 rounded-2xl border border-white/10 bg-slate-900/80 px-3.5 py-2.5 text-xs font-semibold text-slate-300 hover:bg-slate-800 transition-all"
                 title="Copy One-Line Pitch to Clipboard"
               >
                 <Copy className="h-3.5 w-3.5 text-slate-400" />
                 <span>{copied ? 'Copied Pitch!' : 'Copy Pitch'}</span>
-              </button>
+              </motion.button>
             </div>
           </div>
 
@@ -325,7 +333,9 @@ export const OverviewStage: React.FC<OverviewStageProps> = ({
             <button
               onClick={() => {
                 soundEngine.playClick();
-                alert('Projects view: All 4 workspace brands are synced and editable.');
+                if (onOpenCommandPalette) {
+                  onOpenCommandPalette();
+                }
               }}
               className="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center"
             >
@@ -388,61 +398,69 @@ export const OverviewStage: React.FC<OverviewStageProps> = ({
           </h3>
 
           <div className="grid grid-cols-2 gap-2.5">
-            <button
+            <motion.button
+              whileTap={{ scale: 0.94 }}
+              whileHover={{ y: -2 }}
               onClick={() => {
                 soundEngine.playClick();
                 if (onOpenNewModal) onOpenNewModal();
               }}
-              className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-slate-900/60 p-4 text-center hover:bg-slate-800 hover:border-indigo-500/40 transition-all group"
+              className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-slate-900/60 p-4 text-center hover:bg-slate-800/80 hover:border-indigo-500/40 transition-all group"
             >
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 group-hover:scale-110 transition-transform">
                 <Plus className="h-5 w-5" />
               </div>
               <span className="mt-2 text-xs font-bold text-white">New Brand Idea</span>
               <span className="text-[10px] text-slate-400">Start with rough idea</span>
-            </button>
+            </motion.button>
 
-            <button
+            <motion.button
+              whileTap={{ scale: 0.94 }}
+              whileHover={{ y: -2 }}
               onClick={() => {
                 soundEngine.playClick();
                 setActiveTab('battle');
               }}
-              className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-slate-900/60 p-4 text-center hover:bg-slate-800 hover:border-purple-500/40 transition-all group"
+              className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-slate-900/60 p-4 text-center hover:bg-slate-800/80 hover:border-purple-500/40 transition-all group"
             >
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 group-hover:scale-110 transition-transform">
                 <Flame className="h-5 w-5" />
               </div>
               <span className="mt-2 text-xs font-bold text-white">Brand Battle</span>
               <span className="text-[10px] text-slate-400">AI critique &amp; improve</span>
-            </button>
+            </motion.button>
 
-            <button
+            <motion.button
+              whileTap={{ scale: 0.94 }}
+              whileHover={{ y: -2 }}
               onClick={() => {
                 soundEngine.playClick();
                 setActiveTab('guardian');
               }}
-              className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-slate-900/60 p-4 text-center hover:bg-slate-800 hover:border-teal-500/40 transition-all group"
+              className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-slate-900/60 p-4 text-center hover:bg-slate-800/80 hover:border-teal-500/40 transition-all group"
             >
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-500/10 text-teal-400 group-hover:scale-110 transition-transform">
                 <Scale className="h-5 w-5" />
               </div>
               <span className="mt-2 text-xs font-bold text-white">Brand Guardian</span>
               <span className="text-[10px] text-slate-400">Check consistency</span>
-            </button>
+            </motion.button>
 
-            <button
+            <motion.button
+              whileTap={{ scale: 0.94 }}
+              whileHover={{ y: -2 }}
               onClick={() => {
                 soundEngine.playClick();
                 setActiveTab('launch');
               }}
-              className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-slate-900/60 p-4 text-center hover:bg-slate-800 hover:border-amber-500/40 transition-all group"
+              className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-slate-900/60 p-4 text-center hover:bg-slate-800/80 hover:border-amber-500/40 transition-all group"
             >
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400 group-hover:scale-110 transition-transform">
                 <PackageCheck className="h-5 w-5" />
               </div>
               <span className="mt-2 text-xs font-bold text-white">Launch Kit</span>
               <span className="text-[10px] text-slate-400">Generate assets</span>
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>

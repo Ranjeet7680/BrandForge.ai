@@ -9,6 +9,8 @@ import {
   Play,
   CheckCircle2
 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { soundEngine } from '@/lib/sound-engine';
 import { BrandBattleData } from '@/types/brand';
 
 interface BrandBattleStageProps {
@@ -26,16 +28,19 @@ export const BrandBattleStage: React.FC<BrandBattleStageProps> = ({
   const [isSimulating, setIsSimulating] = useState(false);
 
   const simulateDebate = () => {
+    soundEngine.playClick();
     setIsSimulating(true);
     setActiveRound(1);
     let current = 1;
     const interval = setInterval(() => {
       current++;
       if (current <= battleData.debateRounds.length) {
+        soundEngine.playClick();
         setActiveRound(current);
       } else {
         clearInterval(interval);
         setIsSimulating(false);
+        soundEngine.playSuccessChord();
       }
     }, 700);
   };
@@ -46,7 +51,7 @@ export const BrandBattleStage: React.FC<BrandBattleStageProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/10 pb-6">
         <div>
           <div className="flex items-center space-x-2">
-            <span className="rounded-md bg-purple-500/10 px-2.5 py-1 text-xs font-semibold text-purple-400 border border-purple-500/20 flex items-center gap-1">
+            <span className="rounded-full bg-purple-500/10 px-3 py-1 text-xs font-semibold text-purple-400 border border-purple-500/20 flex items-center gap-1.5">
               <Flame className="h-3.5 w-3.5" />
               SPECIAL FEATURE: BRAND BATTLE
             </span>
@@ -54,7 +59,7 @@ export const BrandBattleStage: React.FC<BrandBattleStageProps> = ({
               MULTI-AGENT ADVERSARIAL COUNCIL
             </span>
           </div>
-          <h1 className="mt-2 text-2xl sm:text-3xl font-bold text-white tracking-tight">
+          <h1 className="mt-2 text-2xl sm:text-3xl font-black text-white tracking-tight">
             Brand Battle Arena: 5 AI Agents Debate {brandName}
           </h1>
           <p className="mt-1 text-sm text-slate-400">
@@ -62,22 +67,27 @@ export const BrandBattleStage: React.FC<BrandBattleStageProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center space-x-2 self-start sm:self-auto">
-          <button
+        <div className="flex items-center space-x-2.5 self-start sm:self-auto">
+          <motion.button
+            whileTap={{ scale: 0.94 }}
             onClick={simulateDebate}
             disabled={isSimulating}
-            className="flex items-center space-x-1.5 rounded-lg border border-purple-500/40 bg-purple-500/20 px-3.5 py-2 text-xs font-semibold text-purple-200 hover:bg-purple-500/30 transition-colors shadow-sm disabled:opacity-50"
+            className="flex items-center space-x-1.5 rounded-2xl border border-purple-500/40 bg-purple-500/15 px-4 py-2.5 text-xs font-bold text-purple-200 hover:bg-purple-500/25 transition-all shadow-sm disabled:opacity-50"
           >
             <Play className={`h-3.5 w-3.5 ${isSimulating ? 'animate-spin' : ''}`} />
             <span>{isSimulating ? 'Debate in Progress...' : 'Replay Agent Debate'}</span>
-          </button>
-          <button
-            onClick={onProceedToDeliver}
-            className="flex items-center space-x-1.5 rounded-lg bg-indigo-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-indigo-500 transition-colors shadow-sm"
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.94 }}
+            onClick={() => {
+              soundEngine.playClick();
+              onProceedToDeliver();
+            }}
+            className="flex items-center space-x-1.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-cyan-600 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-indigo-600/25 hover:from-indigo-500 hover:to-cyan-500 transition-all"
           >
             <span>Proceed to Launch Kit</span>
             <ArrowRight className="h-3.5 w-3.5" />
-          </button>
+          </motion.button>
         </div>
       </div>
 

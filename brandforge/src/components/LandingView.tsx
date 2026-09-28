@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import {
   Sparkles,
   ArrowRight,
@@ -28,9 +29,11 @@ import { soundEngine } from '@/lib/sound-engine';
 
 interface LandingViewProps {
   onStartBuilding: () => void;
-  onViewExample: () => void;
-  onOpenAuth: () => void;
+  onViewExample: (presetId?: string) => void;
+  onOpenAuth: (mode?: any) => void;
   onNavigateToDashboard?: (tab?: string) => void;
+  onLoadTemplate?: (template: any) => void;
+  user?: { name: string; email: string; role: string };
 }
 
 export const LandingView: React.FC<LandingViewProps> = ({
@@ -38,6 +41,8 @@ export const LandingView: React.FC<LandingViewProps> = ({
   onViewExample,
   onOpenAuth,
   onNavigateToDashboard,
+  onLoadTemplate,
+  user,
 }) => {
   // Features section category filter and search state
   const [featureCategory, setFeatureCategory] = useState<'all' | 'strategy' | 'identity' | 'protection' | 'ml'>('all');
@@ -407,7 +412,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
         <div className="mx-auto max-w-7xl flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo */}
           <div
-            onClick={onViewExample}
+            onClick={() => onViewExample()}
             className="flex items-center space-x-2.5 cursor-pointer"
           >
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-purple-600 to-cyan-400 p-0.5 shadow-md shadow-indigo-500/30">
@@ -499,27 +504,31 @@ export const LandingView: React.FC<LandingViewProps> = ({
 
           {/* Hero Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3">
-            <button
+            <motion.button
+              whileTap={{ scale: 0.94 }}
+              whileHover={{ scale: 1.02, y: -2 }}
               onClick={() => {
                 soundEngine.playClick();
                 onStartBuilding();
               }}
-              className="w-full sm:w-auto flex items-center justify-center space-x-2 rounded-xl bg-gradient-to-r from-cyan-500 via-indigo-600 to-purple-600 px-8 py-3.5 text-sm font-bold text-white shadow-xl shadow-cyan-500/25 hover:from-cyan-400 hover:to-purple-500 transition-all hover:scale-105"
+              className="w-full sm:w-auto flex items-center justify-center space-x-2 rounded-2xl bg-gradient-to-r from-cyan-500 via-indigo-600 to-purple-600 px-8 py-3.5 text-sm font-bold text-white shadow-xl shadow-cyan-500/25 hover:from-cyan-400 hover:to-purple-500 transition-all"
             >
               <Sparkles className="h-4 w-4" />
               <span>Forge New Idea Now →</span>
-            </button>
+            </motion.button>
 
-            <button
+            <motion.button
+              whileTap={{ scale: 0.94 }}
+              whileHover={{ scale: 1.02, y: -2 }}
               onClick={() => {
                 soundEngine.playClick();
                 onViewExample();
               }}
-              className="w-full sm:w-auto flex items-center justify-center space-x-2 rounded-xl border border-white/10 bg-slate-900/80 px-8 py-3.5 text-sm font-semibold text-slate-200 hover:bg-slate-800 transition-all"
+              className="w-full sm:w-auto flex items-center justify-center space-x-2 rounded-2xl border border-white/10 bg-slate-900/80 px-8 py-3.5 text-sm font-semibold text-slate-200 hover:bg-slate-800 transition-all"
             >
               <Play className="h-4 w-4 text-cyan-400" />
               <span>Watch Demo (HackForge)</span>
-            </button>
+            </motion.button>
           </div>
 
           {/* Floating UI Hero Visual (From Screenshot) */}
@@ -786,8 +795,8 @@ export const LandingView: React.FC<LandingViewProps> = ({
 
           {/* Category Filter Tabs & Search Bar */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-white/10 pb-6">
-            {/* Filter Tabs */}
-            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            {/* iOS Segmented Filter Tabs */}
+            <div className="ios-segmented-trough flex flex-wrap items-center gap-1 p-1 rounded-2xl bg-black/40 border border-white/10 backdrop-blur-xl">
               {[
                 { id: 'all', label: 'All Systems', count: 12 },
                 { id: 'strategy', label: 'Strategy & Market', count: 3 },
@@ -797,27 +806,35 @@ export const LandingView: React.FC<LandingViewProps> = ({
               ].map((tab) => {
                 const isActive = featureCategory === tab.id;
                 return (
-                  <button
+                  <motion.button
                     key={tab.id}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => {
                       soundEngine.playClick();
                       setFeatureCategory(tab.id as typeof featureCategory);
                     }}
-                    className={`flex items-center space-x-2 rounded-xl px-3.5 py-2 text-xs font-bold transition-all ${
+                    className={`relative flex items-center space-x-2 rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all ${
                       isActive
-                        ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 text-white shadow-lg shadow-indigo-600/30'
-                        : 'bg-slate-900/80 border border-white/10 text-slate-400 hover:text-white hover:border-white/20'
+                        ? 'text-white'
+                        : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
-                    <span>{tab.label}</span>
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeFeatureCategoryPill"
+                        className="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-600/70 to-purple-600/70 border border-white/20 shadow-md backdrop-blur-md"
+                        transition={{ type: 'spring', stiffness: 450, damping: 32 }}
+                      />
+                    )}
+                    <span className="relative z-10">{tab.label}</span>
                     <span
-                      className={`rounded-full px-1.5 py-0.2 text-[10px] font-mono ${
-                        isActive ? 'bg-black/30 text-white' : 'bg-slate-800 text-slate-400'
+                      className={`relative z-10 rounded-full px-1.5 py-0.2 text-[10px] font-mono ${
+                        isActive ? 'bg-white/20 text-white' : 'bg-white/5 text-slate-400'
                       }`}
                     >
                       {tab.count}
                     </span>
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
@@ -1126,24 +1143,33 @@ export const LandingView: React.FC<LandingViewProps> = ({
             </p>
           </div>
 
-          {/* Direction Tabs */}
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            {(['A', 'B', 'C', 'D', 'E'] as const).map((dirKey) => (
-              <button
-                key={dirKey}
-                onClick={() => {
-                  soundEngine.playClick();
-                  setSelectedDirection(dirKey);
-                }}
-                className={`rounded-xl px-4 py-2 text-xs font-bold transition-all ${
-                  selectedDirection === dirKey
-                    ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/30'
-                    : 'bg-slate-900 border border-white/10 text-slate-400 hover:text-white'
-                }`}
-              >
-                {battleDirections[dirKey].name.split('—')[1]}
-              </button>
-            ))}
+          {/* iOS Segmented Direction Tabs */}
+          <div className="ios-segmented-trough flex flex-wrap items-center justify-center gap-1 p-1 rounded-2xl bg-black/40 border border-white/10 backdrop-blur-xl max-w-2xl mx-auto">
+            {(['A', 'B', 'C', 'D', 'E'] as const).map((dirKey) => {
+              const isSelected = selectedDirection === dirKey;
+              return (
+                <motion.button
+                  key={dirKey}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    soundEngine.playClick();
+                    setSelectedDirection(dirKey);
+                  }}
+                  className={`relative rounded-xl px-4 py-2 text-xs font-bold transition-all ${
+                    isSelected ? 'text-white' : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {isSelected && (
+                    <motion.div
+                      layoutId="activeBattleDirPill"
+                      className="absolute inset-0 rounded-xl bg-gradient-to-r from-rose-600/80 to-purple-600/80 border border-white/20 shadow-md backdrop-blur-md"
+                      transition={{ type: 'spring', stiffness: 450, damping: 32 }}
+                    />
+                  )}
+                  <span className="relative z-10">{battleDirections[dirKey].name.split('—')[1]}</span>
+                </motion.button>
+              );
+            })}
           </div>
 
           {/* Selected Direction Review Card */}
@@ -1560,8 +1586,8 @@ export const LandingView: React.FC<LandingViewProps> = ({
             <a href="#how-it-works" className="hover:text-white">How It Works</a>
             <a href="#pricing" className="hover:text-white">Pricing</a>
             <a href="#faq" className="hover:text-white">FAQ</a>
-            <button onClick={onViewExample} className="hover:text-white">Workspace Demo</button>
-            <button onClick={onOpenAuth} className="hover:text-white">Sign In</button>
+            <button onClick={() => onViewExample()} className="hover:text-white">Workspace Demo</button>
+            <button onClick={() => onOpenAuth()} className="hover:text-white">Sign In</button>
           </div>
 
           <p className="text-[11px] text-slate-400">

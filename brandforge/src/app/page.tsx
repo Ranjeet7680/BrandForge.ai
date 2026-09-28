@@ -4,9 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { PRESET_PROJECTS } from '@/lib/brand-engine/presets';
 import { BrandProject, RawBrandInput, Stage1Discover } from '@/types/brand';
 import { AIConfig } from '@/lib/brand-engine/llm-service';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Navbar } from '@/components/Navbar';
 import { Sidebar, ActiveTab } from '@/components/Sidebar';
 import { StageProgress } from '@/components/StageProgress';
+import { DynamicIsland } from '@/components/DynamicIsland';
 import { LandingView } from '@/components/LandingView';
 import { WelcomeLoading } from '@/components/WelcomeLoading';
 import { AuthModal, AuthMode } from '@/components/auth/AuthModal';
@@ -81,6 +83,18 @@ export default function Home() {
     } catch (e) {
       console.warn('Could not read from localStorage', e);
     }
+  }, []);
+
+  // Global ⌘K / Ctrl+K listener for Spotlight Command Palette
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const saveAiConfig = (newConfig: AIConfig) => {
@@ -216,88 +230,95 @@ export default function Home() {
     setActiveTab('overview');
   };
 
+  const handleCreateProject = (
+    name?: string,
+    idea?: string,
+    tier?: string,
+    category?: string,
+    targetAudience?: string
+  ) => {
+    handleCreateNewProject({
+      idea: idea || name || 'Autonomous AI Brand Intelligence Project',
+      targetMarket: targetAudience || 'Modern Builders and Innovators',
+      existingProblem: 'Lack of unified brand intelligence, strategy, and design alignment',
+      location: 'Global (Online-first)',
+      businessGoals: `Launch ${name || 'Product'} with category creation and launch-ready identity`,
+      constraints: 'Fast execution, high distinctiveness',
+      competitors: category || 'Incumbent platforms',
+    });
+  };
+
   return (
     <div className="min-h-screen bg-[#090c15] text-slate-100 flex flex-col font-sans">
       {/* 1. Cinematic Welcome Loading Screen (Plays first or on replay) */}
       {showWelcome && <WelcomeLoading onComplete={handleFinishWelcome} />}
 
-      {/* Top Navigation */}
-      <Navbar
-        currentProject={currentProject}
-        projects={projects}
-        onSelectProject={handleSelectProject}
-        onOpenNewModal={() => setIsNewModalOpen(true)}
-        onOpenSettingsModal={() => setIsSettingsModalOpen(true)}
-        onOpenExportModal={() => setIsExportModalOpen(true)}
-        aiSource={aiConfig.provider}
-        onNavigateToStage={(tab) => {
-          setActiveTab(tab as ActiveTab);
-          setShowLanding(false);
-        }}
-        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
-        onReplayLoading={handleReplayWelcome}
-        onOpenLanding={() => setShowLanding(true)}
-        user={currentUser}
-        onOpenAuth={() => handleOpenAuth('login')}
-        onLogout={() => {
-          handleOpenAuth('login');
-        }}
-      />
-
-      {/* Top Banner Mode Switcher (Landing vs Workspace) */}
-      <div className="no-print bg-[#0b0f1a] border-b border-white/5 px-4 py-1.5 flex items-center justify-between text-[11px] text-slate-400">
-        <div className="flex items-center space-x-2">
-          <span>Mode:</span>
-          <button
-            onClick={() => setShowLanding(false)}
-            className={`rounded px-2.5 py-0.5 font-medium transition-colors ${
-              !showLanding ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Dashboard Workspace
-          </button>
-          <button
-            onClick={() => setShowLanding(true)}
-            className={`rounded px-2.5 py-0.5 font-medium transition-colors ${
-              showLanding ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Product Landing Page
-          </button>
-        </div>
-
-        <div className="hidden sm:flex items-center space-x-3">
-          <span>Inkloom Multi-Agent Brand Engine</span>
-          <span>•</span>
-          <button
-            onClick={() => setIsCommandPaletteOpen(true)}
-            className="text-cyan-400 hover:text-cyan-300 font-mono"
-          >
-            Press Ctrl + K for Fast Search
-          </button>
-        </div>
-      </div>
-
       {showLanding ? (
         <LandingView
           onStartBuilding={() => handleOpenAuth('login')}
-          onViewExample={() => {
-            setCurrentProjectId('project-hackforge');
+          onViewExample={(presetId?: string) => {
+            if (presetId) {
+              setCurrentProjectId(presetId);
+            } else {
+              setCurrentProjectId('project-hackforge');
+            }
             setActiveTab('overview');
             setShowLanding(false);
           }}
-          onOpenAuth={() => handleOpenAuth('login')}
+          onOpenAuth={handleOpenAuth}
           onNavigateToDashboard={(tab) => {
             if (tab) setActiveTab(tab as ActiveTab);
             setShowLanding(false);
           }}
+          onLoadTemplate={(template) => {
+            handleCreateProject(
+              template.name,
+              template.idea,
+              'pro',
+              template.category,
+              template.targetAudience
+            );
+          }}
+          user={currentUser}
         />
       ) : (
         <>
+          {/* Top Navigation for Workspace */}
+          <Navbar
+            currentProject={currentProject}
+            projects={projects}
+            onSelectProject={handleSelectProject}
+            onOpenNewModal={() => setIsNewModalOpen(true)}
+            onOpenSettingsModal={() => setIsSettingsModalOpen(true)}
+            onOpenExportModal={() => setIsExportModalOpen(true)}
+            aiSource={aiConfig.provider}
+            onNavigateToStage={(tab) => {
+              setActiveTab(tab as ActiveTab);
+              setShowLanding(false);
+            }}
+            onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+            onReplayLoading={handleReplayWelcome}
+            onOpenLanding={() => setShowLanding(true)}
+            user={currentUser}
+            onOpenAuth={() => handleOpenAuth('login')}
+            onLogout={() => {
+              handleOpenAuth('login');
+            }}
+          />
+
           {/* Stage Breadcrumb Bar */}
           <StageProgress
             activeTab={activeTab}
             setActiveTab={setActiveTab}
+            onOpenNewModal={() => setIsNewModalOpen(true)}
+          />
+
+          {/* iOS Dynamic Island Status Hub */}
+          <DynamicIsland
+            currentProject={currentProject}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            onOpenExportModal={() => setIsExportModalOpen(true)}
             onOpenNewModal={() => setIsNewModalOpen(true)}
           />
 
@@ -317,91 +338,107 @@ export default function Home() {
               onOpenNewModal={() => setIsNewModalOpen(true)}
             />
 
-            {/* Dynamic Stage View Container */}
-            <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-8 lg:px-10 pb-24 md:pb-12">
+            {/* Dynamic Stage View Container with iOS Spring Physics */}
+            <main className="flex-1 overflow-y-auto px-4 py-4 sm:px-8 lg:px-10 pb-28 md:pb-12">
               <div className="mx-auto max-w-6xl">
-                {activeTab === 'overview' && (
-                  <OverviewStage
-                    project={currentProject}
-                    setActiveTab={setActiveTab}
-                    onOpenExportModal={() => setIsExportModalOpen(true)}
-                    onOpenNewModal={() => setIsNewModalOpen(true)}
-                    onSelectProject={handleSelectProject}
-                  />
-                )}
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeTab}
+                    initial={{ opacity: 0, y: 14, scale: 0.992 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.992 }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 380,
+                      damping: 32,
+                      mass: 0.8,
+                    }}
+                  >
+                    {activeTab === 'overview' && (
+                      <OverviewStage
+                        project={currentProject}
+                        setActiveTab={setActiveTab}
+                        onOpenExportModal={() => setIsExportModalOpen(true)}
+                        onOpenNewModal={() => setIsNewModalOpen(true)}
+                        onSelectProject={handleSelectProject}
+                        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+                      />
+                    )}
 
-                {activeTab === 'discover' && (
-                  <DiscoverStage
-                    discover={currentProject.stage1Discover}
-                    rawIdea={currentProject.rawInput.idea}
-                    targetMarket={currentProject.rawInput.targetMarket}
-                    onProceedToNext={() => setActiveTab('position')}
-                    onUpdateDiscover={handleUpdateDiscover}
-                  />
-                )}
+                    {activeTab === 'discover' && (
+                      <DiscoverStage
+                        discover={currentProject.stage1Discover}
+                        rawIdea={currentProject.rawInput.idea}
+                        targetMarket={currentProject.rawInput.targetMarket}
+                        onProceedToNext={() => setActiveTab('position')}
+                        onUpdateDiscover={handleUpdateDiscover}
+                      />
+                    )}
 
-                {activeTab === 'position' && (
-                  <PositionStage
-                    position={currentProject.stage2Position}
-                    brandName={currentProject.name}
-                    onProceedToNext={() => setActiveTab('shape')}
-                  />
-                )}
+                    {activeTab === 'position' && (
+                      <PositionStage
+                        position={currentProject.stage2Position}
+                        brandName={currentProject.name}
+                        onProceedToNext={() => setActiveTab('shape')}
+                      />
+                    )}
 
-                {activeTab === 'shape' && (
-                  <PersonalityStage
-                    shape={currentProject.stage3Shape}
-                    onUpdateSelectedName={handleUpdateSelectedName}
-                    onUpdateSelectedTagline={handleUpdateSelectedTagline}
-                    onProceedToNext={() => setActiveTab('visualize')}
-                  />
-                )}
+                    {activeTab === 'shape' && (
+                      <PersonalityStage
+                        shape={currentProject.stage3Shape}
+                        onUpdateSelectedName={handleUpdateSelectedName}
+                        onUpdateSelectedTagline={handleUpdateSelectedTagline}
+                        onProceedToNext={() => setActiveTab('visualize')}
+                      />
+                    )}
 
-                {activeTab === 'visualize' && (
-                  <VisualIdentityStage
-                    visualize={currentProject.stage4Visualize}
-                    brandName={currentProject.name}
-                    onProceedToNext={() => setActiveTab('critic')}
-                  />
-                )}
+                    {activeTab === 'visualize' && (
+                      <VisualIdentityStage
+                        visualize={currentProject.stage4Visualize}
+                        brandName={currentProject.name}
+                        onProceedToNext={() => setActiveTab('critic')}
+                      />
+                    )}
 
-                {activeTab === 'critic' && (
-                  <BrandCriticStage
-                    critic={currentProject.stage5Critic}
-                    brandName={currentProject.name}
-                    onProceedToBattle={() => setActiveTab('battle')}
-                    onProceedToDeliver={() => setActiveTab('launch')}
-                  />
-                )}
+                    {activeTab === 'critic' && (
+                      <BrandCriticStage
+                        critic={currentProject.stage5Critic}
+                        brandName={currentProject.name}
+                        onProceedToBattle={() => setActiveTab('battle')}
+                        onProceedToDeliver={() => setActiveTab('launch')}
+                      />
+                    )}
 
-                {activeTab === 'battle' && (
-                  <BrandBattleStage
-                    battleData={currentProject.brandBattle}
-                    brandName={currentProject.name}
-                    onProceedToDeliver={() => setActiveTab('launch')}
-                  />
-                )}
+                    {activeTab === 'battle' && (
+                      <BrandBattleStage
+                        battleData={currentProject.brandBattle}
+                        brandName={currentProject.name}
+                        onProceedToDeliver={() => setActiveTab('launch')}
+                      />
+                    )}
 
-                {activeTab === 'guardian' && (
-                  <GuardianStage
-                    project={currentProject}
-                    onProceedToDeliver={() => setActiveTab('quality')}
-                  />
-                )}
+                    {activeTab === 'guardian' && (
+                      <GuardianStage
+                        project={currentProject}
+                        onProceedToDeliver={() => setActiveTab('quality')}
+                      />
+                    )}
 
-                {activeTab === 'quality' && (
-                  <QualityReportStage
-                    project={currentProject}
-                    onProceedToDeliver={() => setActiveTab('launch')}
-                  />
-                )}
+                    {activeTab === 'quality' && (
+                      <QualityReportStage
+                        project={currentProject}
+                        onProceedToDeliver={() => setActiveTab('launch')}
+                      />
+                    )}
 
-                {activeTab === 'launch' && (
-                  <LaunchKitStage
-                    project={currentProject}
-                    onOpenExportModal={() => setIsExportModalOpen(true)}
-                  />
-                )}
+                    {activeTab === 'launch' && (
+                      <LaunchKitStage
+                        project={currentProject}
+                        onOpenExportModal={() => setIsExportModalOpen(true)}
+                      />
+                    )}
+                  </motion.div>
+                </AnimatePresence>
               </div>
             </main>
           </div>
